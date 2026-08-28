@@ -282,5 +282,5 @@ Real-sail corrections (membrane billow, finite slew rate, self-shadowing) contri
 ---
 
 <div align="center">
-<sub>Built with NumPy · SciPy · Matplotlib &nbsp;|&nbsp; OUSUMS Lab, IISc Physics, Bangalore</sub>
+<sub>Built with NumPy · SciPy · Matplotlib &nbsp;|&nbsp; IISc Physics, Bangalore</sub>
 </div>

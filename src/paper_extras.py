@@ -661,42 +661,50 @@ def fig_stationkeeping_halo(
     orbit_nums = np.arange(len(errors_c)) / 2.0   # half-periods → orbit count
 
     # ── 4. Plot ───────────────────────────────────────────────────────────────
-    _DARK  = '#0d1117'
+    # White ground, Okabe-Ito hues, dash-coded series — matches the rest of the
+    # figure set (paperstyle.py) and stays legible in greyscale print.
+    _BG     = 'white'
+    _INK    = '#1a1a1a'
+    _SPINE  = '#333333'
+    _FAINT  = '#888888'
+    _RED    = '#D55E00'   # uncorrected
+    _BLUE   = '#0072B2'   # station-kept
+    _GREEN  = '#009E73'   # cone-angle command
+
+    _apply_style()
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), sharex=True,
                                     gridspec_kw={'height_ratios': [2, 1]})
-    fig.patch.set_facecolor(_DARK)
+    fig.patch.set_facecolor(_BG)
     for ax in (ax1, ax2):
-        ax.set_facecolor(_DARK)
+        ax.set_facecolor(_BG)
+        ax.tick_params(colors=_INK, direction='in', top=True, right=True)
+        for sp in ax.spines.values():
+            sp.set_color(_SPINE)
+            sp.set_linewidth(0.8)
 
-    ax1.semilogy(orbit_nums, errors_uc, color='#ff4444', lw=1.4, ls='--',
-                 alpha=0.8, label='No station-keeping')
-    ax1.semilogy(orbit_nums, errors_c,  color='#4ECDC4', lw=1.8,
+    ax1.semilogy(orbit_nums, errors_uc, color=_RED, lw=1.4, ls='--',
+                 label='No station-keeping')
+    ax1.semilogy(orbit_nums, errors_c,  color=_BLUE, lw=1.8,
                  label='With station-keeping (sail α correction)')
-    ax1.axhline(perturb_km, color='#888', lw=0.8, ls=':', alpha=0.6)
+    ax1.axhline(perturb_km, color=_FAINT, lw=0.8, ls=':')
     ax1.text(0.02, perturb_km * 1.15, f'Initial perturbation  {perturb_km:.0f} km',
-             color='#888', fontsize=8, transform=ax1.get_yaxis_transform())
-    ax1.set_ylabel('Position error  [km]', color='#e8e8e8', fontsize=11)
+             color=_FAINT, fontsize=8, transform=ax1.get_yaxis_transform())
+    ax1.set_ylabel('Position error  [km]', color=_INK, fontsize=11)
     ax1.set_title(f'Halo Orbit Station-Keeping  '
                   f'(β = {beta}, Az ≈ {Az_nd * AU_KM / 1e6:.0f} M km)',
-                  color='#e8e8e8', fontsize=13)
-    ax1.legend(facecolor='#1a1a2e', labelcolor='#e8e8e8',
-               framealpha=0.85, fontsize=10)
-    ax1.tick_params(colors='#e8e8e8')
-    for sp in ax1.spines.values():
-        sp.set_color('#555')
+                  color=_INK, fontsize=13)
+    ax1.legend(facecolor=_BG, edgecolor=_SPINE, labelcolor=_INK,
+               framealpha=1.0, fontsize=10)
 
     ax2.step(orbit_nums[:len(alphas_hist)], alphas_hist,
-             color='#FFE66D', lw=1.5, where='post', label='Cone angle α')
-    ax2.set_xlabel('Orbit number', color='#e8e8e8', fontsize=11)
-    ax2.set_ylabel('α correction  [°]', color='#e8e8e8', fontsize=11)
-    ax2.tick_params(colors='#e8e8e8')
-    for sp in ax2.spines.values():
-        sp.set_color('#555')
-    ax2.legend(facecolor='#1a1a2e', labelcolor='#e8e8e8',
-               framealpha=0.85, fontsize=10)
+             color=_GREEN, lw=1.5, where='post', label='Cone angle α')
+    ax2.set_xlabel('Orbit number', color=_INK, fontsize=11)
+    ax2.set_ylabel('α correction  [°]', color=_INK, fontsize=11)
+    ax2.legend(facecolor=_BG, edgecolor=_SPINE, labelcolor=_INK,
+               framealpha=1.0, fontsize=10)
 
     plt.tight_layout()
-    plt.savefig(output, dpi=150, bbox_inches='tight', facecolor=_DARK)
+    plt.savefig(output, dpi=150, bbox_inches='tight', facecolor=_BG)
     plt.close(fig)
     if verbose:
         print(f"  ✓  Saved → {output}")

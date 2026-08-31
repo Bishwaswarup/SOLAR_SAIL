@@ -36,6 +36,7 @@ import numpy as np
 from scipy.optimize import brentq
 
 from src.equilibria import find_artificial_equilibrium
+from src.jacobi import jacobi_constant_sail
 from src.orbits import compute_halo_orbit
 
 MU_EM = 0.01215
@@ -44,14 +45,19 @@ EM_KM = 384_400.0
 
 def jacobi_constant(state: np.ndarray, mu: float = MU_EM) -> float:
     """
-    Jacobi constant  C = 2U - v^2,  with
-        U = (x^2 + y^2)/2 + (1-mu)/r1 + mu/r2
+    Jacobi constant for the UNSAILED Earth-Moon problem.
+
+    Everything in this module runs at beta = 0 (see compute_halo_orbit below),
+    where the sail and gravitational Jacobi integrals coincide identically.  So
+    this delegates to the canonical implementation with beta pinned to 0.0
+    rather than carrying a second copy of the formula: one implementation, and
+    the beta = 0 assumption is visible at the point it is made.
+
+    If sail effects are ever introduced here, this wrapper must go and the call
+    sites must pass the real beta — see src/jacobi.py on why C_grav is not an
+    integral for beta != 0.
     """
-    x, y, z, vx, vy, vz = state
-    r1 = np.sqrt((x + mu)**2 + y**2 + z**2)
-    r2 = np.sqrt((x - (1.0 - mu))**2 + y**2 + z**2)
-    U = 0.5 * (x * x + y * y) + (1.0 - mu) / r1 + mu / r2
-    return 2.0 * U - (vx * vx + vy * vy + vz * vz)
+    return float(jacobi_constant_sail(state, mu, 0.0))
 
 
 def lagrange_point(which: str = 'L1', mu: float = MU_EM) -> np.ndarray:
@@ -77,63 +83,43 @@ def family(which: str = 'L1',
     dict with arrays  Az, C, T, state0 (list), and `n_failed`
     """
     if az_grid is None:
-        az_grid = np.linspace(0.008, 0.050, 22)
+        az_grid = np.linspace(0.010, 0.055, 24)
 
-    Az_ok, C_ok, T_ok, S_ok = [], [], [], []
-    guess = None
-    n_failed = 0
-
-    for Az in az_grid:
-        try:
-            _, s0, T = _C_of_Az(which, float(Az), mu, guess=guess)
-        except Exception:
-            n_failed += 1
-            continue
-
-        # reject a jump to a different branch: state AND period must move smoothly
-        if S_ok:
-            if (np.linalg.norm(s0 - S_ok[-1]) > 0.05
-                    or abs(T - T_ok[-1]) > 0.15 * T_ok[-1]):
-                n_failed += 1
-                continue
-
-        guess = s0.copy()
-        Az_ok.append(float(Az))
-        C_ok.append(jacobi_constant(s0, mu))
-        T_ok.append(float(T))
-        S_ok.append(s0.copy())
+    from src.orbits import halo_family
+    f = halo_family(lagrange_point(which, mu), mu, az_grid,
+                    amplitude='z0', verbose=False)
 
     if verbose:
-        print(f"    {which}: {len(Az_ok)}/{len(az_grid)} converged on-branch"
-              f"  ({n_failed} rejected)")
-        if C_ok:
-            print(f"    Az [{Az_ok[0]:.4f}, {Az_ok[-1]:.4f}]"
-                  f"   C [{min(C_ok):.6f}, {max(C_ok):.6f}]")
+        print(f"    {which}: {f['Az'].size}/{len(az_grid)} on-branch"
+              f"  ({f['n_failed']} skipped)")
+        if f['Az'].size:
+            print(f"    Az [{f['Az'][0]:.4f}, {f['Az'][-1]:.4f}]"
+                  f"   C [{f['C'].min():.6f}, {f['C'].max():.6f}]")
 
-    return dict(which=which, Az=np.array(Az_ok), C=np.array(C_ok),
-                T=np.array(T_ok), state0=S_ok, n_failed=n_failed)
-
-
-def _seed_at_Az(prev: np.ndarray | None, Az: float) -> list | None:
-    """
-    Build a continuation seed that actually steps Az.
-
-    compute_halo_orbit's free variables are [x0, vy0, T_half]; z0 is never
-    corrected and Az is never constrained.  So passing the previous solution
-    verbatim as x0 carries its OLD z0 through and Az becomes a no-op.  We keep
-    the continued (x0, vy0) but overwrite z0 with the requested amplitude.
-    """
-    if prev is None:
-        return None
-    return [prev[0], 0.0, float(Az), 0.0, prev[4], 0.0]
+    return dict(which=which, Az=f['Az'], C=f['C'], T=f['T'],
+                state0=f['state0'], n_failed=f['n_failed'],
+                failures=f['failures'])
 
 
 def _C_of_Az(which: str, Az: float, mu: float,
-             guess=None) -> tuple[float, np.ndarray, float]:
+             guess=None, T_guess: float = None,
+             amplitude: str = 'z0') -> tuple[float, np.ndarray, float]:
+    """
+    C, state0, period for the halo at amplitude `Az`.
+
+    Delegates to the fixed corrector in orbits.py, which now pins z0 to Az,
+    accepts a (x0, vy0, T_half) continuation seed without clobbering it,
+    validates against vertical-Lyapunov / axial branches, and falls back to the
+    Richardson guess if a seed lands in the wrong basin.
+    """
     eq = lagrange_point(which, mu)
+    seed = None
+    if guess is not None:
+        seed = (guess[0], guess[4],
+                T_guess / 2.0 if T_guess else None)
     s0, T = compute_halo_orbit(eq, Az=float(Az), mu=mu,
                               alpha=0.0, delta=0.0, beta=0.0,
-                              x0=_seed_at_Az(guess, Az))
+                              seed=seed, amplitude=amplitude)
     return jacobi_constant(s0, mu), s0, T
 
 

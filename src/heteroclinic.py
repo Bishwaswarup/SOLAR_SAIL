@@ -46,12 +46,22 @@ EM_VEL  = 1.023         # characteristic velocity [km/s] = 2π·EM_KM / T_moon
 # Default halo amplitude — matched so L1 and L2 have the same Jacobi constant
 _AZ_DEFAULT = 0.02      # non-dim  (≈ 7,688 km out-of-plane amplitude)
 
+# Dark palette — retained for fig_manifold_transfer (figure 7) only.
 _DARK   = '#0d1117'
 _ORANGE = '#FF6B35'
 _TEAL   = '#4ECDC4'
 _YELLOW = '#FFE66D'
 _WHITE  = '#e8e8e8'
 _GREY   = '#555555'
+
+# Light palette — used by fig_poincare_map (figure 6).  Okabe-Ito hues, which
+# stay distinguishable in greyscale print and under the common CVD types.
+_LIGHT       = 'white'
+_ORANGE_L    = '#D55E00'
+_TEAL_L      = '#0072B2'
+_INK         = '#1a1a1a'
+_GREY_L      = '#555555'
+_GREY_FAINT  = '#999999'
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
@@ -168,36 +178,39 @@ def fig_poincare_map(
 
     # ── plot (y, ẏ) at the Moon section ───────────────────────────────────────
     fig, ax = plt.subplots(figsize=(9, 6))
-    fig.patch.set_facecolor(_DARK)
-    ax.set_facecolor(_DARK)
+    fig.patch.set_facecolor(_LIGHT)
+    ax.set_facecolor(_LIGHT)
 
     if cross_u:
         yu  = [c[1] for c in cross_u]
         dyu = [c[4] for c in cross_u]
-        ax.scatter(yu, dyu, c=_ORANGE, s=22, alpha=0.85, zorder=5,
+        ax.scatter(yu, dyu, marker='o', s=26, facecolors='none',
+                   edgecolors=_ORANGE_L, linewidths=1.0, zorder=5,
                    label='L₁ unstable manifold')
 
     if cross_s:
         ys  = [c[1] for c in cross_s]
         dys = [c[4] for c in cross_s]
-        ax.scatter(ys, dys, c=_TEAL, s=22, alpha=0.85, zorder=5,
+        ax.scatter(ys, dys, marker='s', s=22, facecolors='none',
+                   edgecolors=_TEAL_L, linewidths=1.0, zorder=5,
                    label='L₂ stable manifold')
 
     # Overlap region (intersection → heteroclinic candidates)
-    ax.axvline(0, color=_WHITE, lw=0.5, ls=':', alpha=0.4)
-    ax.axhline(0, color=_WHITE, lw=0.5, ls=':', alpha=0.4)
+    ax.axvline(0, color=_GREY_FAINT, lw=0.6, ls=':', zorder=0)
+    ax.axhline(0, color=_GREY_FAINT, lw=0.6, ls=':', zorder=0)
 
-    ax.set_xlabel('y  [Earth–Moon non-dim]', color=_WHITE, fontsize=12)
-    ax.set_ylabel('ẏ  [non-dim]',             color=_WHITE, fontsize=12)
+    ax.set_xlabel('y  [Earth–Moon non-dim]', color=_INK, fontsize=12)
+    ax.set_ylabel('ẏ  [non-dim]',             color=_INK, fontsize=12)
     ax.set_title(f'Poincaré Section  (x = Moon,  Az = {Az:.2f} nd)\n'
                  'Earth–Moon  L₁ Unstable ∩ L₂ Stable Manifolds',
-                 color=_WHITE, fontsize=13, pad=10)
+                 color=_INK, fontsize=13, pad=10)
 
-    ax.tick_params(colors=_WHITE)
+    ax.tick_params(colors=_INK, direction='in', top=True, right=True)
     for sp in ax.spines.values():
-        sp.set_color(_GREY)
-    ax.legend(facecolor='#1a1a2e', labelcolor=_WHITE,
-              framealpha=0.85, fontsize=11, loc='best')
+        sp.set_color(_INK)
+        sp.set_linewidth(0.8)
+    ax.legend(facecolor=_LIGHT, edgecolor=_GREY_L, labelcolor=_INK,
+              framealpha=1.0, fontsize=11, loc='best')
 
     # Annotate equilibrium x positions for context
     moon_x = data['moon_x']
@@ -205,10 +218,10 @@ def fig_poincare_map(
             f'Section: x = {moon_x:.4f}  (Moon)\n'
             f'L₁ @ x = {L1[0]:.4f}   L₂ @ x = {L2[0]:.4f}',
             transform=ax.transAxes, ha='right', va='top',
-            color='#aaaaaa', fontsize=8)
+            color=_GREY_L, fontsize=8)
 
     plt.tight_layout()
-    plt.savefig(output, dpi=150, bbox_inches='tight', facecolor=_DARK)
+    plt.savefig(output, dpi=150, bbox_inches='tight', facecolor=_LIGHT)
     plt.close(fig)
     print(f"  ✓ Saved → {output}")
     return data

@@ -1,0 +1,16 @@
+# Solar Sail CR3BP — runtime dependencies.
+#
+#   python -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Pinned to the versions the committed figures and halo_atlas.csv were produced
+# with.  Python 3.11.9.  Only these three are imported directly; the rest of the
+# resolved tree (contourpy, cycler, fonttools, kiwisolver, packaging, pillow,
+# pyparsing, python-dateutil, six) comes in as matplotlib's own dependencies.
+numpy==2.4.6
+scipy==1.17.1
+matplotlib==3.11.1
+
+# Optional — test_critical_beta.py exposes test_* functions for pytest, but also
+# runs standalone (`python test_critical_beta.py`) with no test runner present.
+# pytest==8.3.4

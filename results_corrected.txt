@@ -1,0 +1,107 @@
+Solar Sail CR3BP — Corrected Numerical Results
+===============================================
+Supersedes results.txt.  Every number below was re-derived independently in
+verify_critique.py / verify_transfer.py and cross-checked against the project code.
+
+─── HEADLINE RESULT: dissolution of the collinear structure ─────────────────
+For a face-on sail the radiation force is radial and conservative, so it
+rescales solar gravity:  (1-mu) -> (1-beta)(1-mu).  With the Earth deleted,
+
+    x_hover(beta) = [ (1-beta)(1-mu) ]^(1/3)        (heliocentric hovering point)
+
+Linear structure at the on-axis equilibrium:
+    U_xx = 1 + 2A,  U_yy = 1 - A,  U_zz = -A
+    A(beta) = (1-beta)(1-mu)/r1^3 + mu/r2^3  =  1 + s,   s = mu/r2^3
+    real saddle pair exists  <=>  A > 1   <=>  always (s > 0), but s -> 0
+
+  Saddle strength collapse:
+      beta = 0.000    s = 3.030e+00     lam_u = 2.53256
+      beta = 0.010    s = 2.123e+00     lam_u = 2.13831
+      beta = 0.0286   s = 9.977e-01     lam_u = 1.50384    <- tidal parity
+      beta = 0.050    s = 4.012e-01     lam_u = 0.99449
+      beta = 0.100    s = 6.820e-02     lam_u = 0.44400
+      beta = 0.500    s = 3.419e-04     lam_u = 0.03578
+
+  THRESHOLDS
+    (A) Hill-sphere exit    r2 = r_H = (mu/3)^(1/3)
+        beta_crit = 2.9814e-04       (classical L1 already at 0.9967 r_H)
+    (B) Tidal parity        s = 1  <=>  r2 = mu^(1/3) = 3^(1/3) r_H
+        beta_crit = 0.028646         r2 = 0.014427 nd = 2,158,294 km = 1.442 r_H
+        -> INSIDE current sail technology (beta ~ 0.01-0.05)
+
+─── beta = 0.5 reinterpreted ────────────────────────────────────────────────
+  Equilibrium (full 3-body)      x = 0.79367422
+  Hovering law [(1-b)(1-mu)]^1/3 x = 0.79369973
+  Earth's ENTIRE contribution   dx = -2.552e-05 nd = 3,817 km
+  Standoff from Earth            d = 0.206323 nd = 30,865,449 km = 20.63 r_H
+
+  Linear modes at beta = 0.5:
+    A          = 1.00042701
+    in-plane   omega = 1.00042656   period = 6.280506 nd = 365.09 d
+    out-plane  nu    = 1.00021348   period = 6.281844 nd
+    saddle     lam   = 0.035781     e-fold = 27.9475 nd = 1624.6 d
+
+  NOT a resonance: in a 1/r^2 field the epicyclic frequency equals the mean
+  motion identically, so the 2*pi period is forced.
+  NOT stabilisation: exp(0.035781 * 6.281845) = 1.25203, reproducing the
+  reported monodromy eigenvalue 1.252011 to 5 figures.  The residual is the
+  Earth's leftover tug, s(0.5) = 3.419e-04.
+
+─── Sun-Earth "transfer": SELF-MATCHING (invalid) ───────────────────────────
+  main.py builds BOTH manifolds from the same state0_class, so W^u and W^s
+  belong to one orbit and the section necessarily contains that orbit.
+    reproduced |dV|          = 0.049 m/s
+    position residual        = 0.000 km
+    matched pair separation  = 0.000 km        <- same point
+    each point's distance to the halo = 137.9 km  (eps = 150 km seed)
+  There is no second orbit.  This is not a transfer.
+
+─── Earth-Moon halo families (corrected by continuation) ────────────────────
+  L1 point  x = 0.83691801   C = 3.18833572
+  L2 point  x = 1.15567991   C = 3.17215584
+
+  At Az = 0.02:        old (branch-hopped)   corrected
+    C_L1                 3.17093543          3.17093543
+    C_L2                 3.17087868          3.14870567
+    dC                   5.674e-05           2.223e-02
+  The old C_L2 was a spurious orbit: T = 3.5195 vs true family T = 3.40910.
+
+  Tracked family ranges (natural-parameter continuation, z0 stepped explicitly):
+    L1:  Az in [0.010, 0.075]   C in [3.13127854, 3.17348755]
+    L2:  Az in [0.0025, 0.050]  C in [3.14143962, 3.15208752]
+    overlap:                    C in [3.14143962, 3.15208752]
+
+  GENUINE energy-matched pairs (equal C, NOT equal Az):
+      C_target      Az_L1      Az_L2    ratio      T_L1      T_L2
+    3.14165258    0.06446    0.04949      1.3   2.76710   3.39527
+    3.14369698    0.06225    0.04427      1.4   2.76574   3.39936
+    3.14574137    0.05997    0.03842      1.6   2.76436   3.40338
+    3.14778577    0.05763    0.03158      1.8   2.76295   3.40734
+    3.14983017    0.05522    0.02288      2.4   2.76153   3.41124
+    3.15187456    0.05272    0.00740      7.1   2.76008   3.41508
+  Most balanced pair: C = 3.1417, Az_L1 = 0.0645, Az_L2 = 0.0495.
+
+─── 544 m/s figure ─────────────────────────────────────────────────────────
+  A true heteroclinic connection costs ZERO dV by construction.  544 m/s with a
+  57 km residual is a manifold-guided two-impulse transfer, not a heteroclinic
+  connection.  It was also computed at Az = 0.02 for both halos, so its L2
+  endpoint was the spurious orbit above.  fig6 and fig7 are INVALIDATED and
+  must be regenerated at a matched pair with the self-intersection guard.
+
+─── Root cause of the branch-hopping ───────────────────────────────────────
+  compute_halo_orbit free variables:  [x0, vy0, T_half]
+  constraints:                        [vx_f, vz_f, y_f] = 0
+  z0 is never a free variable and Az is never a constraint.  Az only seeds the
+  Richardson guess, and passing x0 replaces z0 entirely (making Az a no-op).
+  Fix applied in jacobi_match.py: continue (x0, vy0) but overwrite z0 with the
+  requested Az each step, plus a period-continuity branch guard.
+  Proper fix: add z0 as a free variable with an amplitude constraint.
+
+─── Sail force model ───────────────────────────────────────────────────────
+  dynamics.py implements the IDEAL SPECULAR REFLECTOR correctly:
+      a = beta (1-mu)/r1^2 * cos^2(alpha) * n_hat        (purely normal)
+  An earlier README draft wrote the PERFECT ABSORBER form
+      a = beta (1-mu)/r1^2 * cos(alpha) * [cos(alpha) n_hat + sin(alpha) t_hat]
+  which is force along the sun-line with magnitude ~ cos(alpha).  They agree
+  only at alpha = 0.  The code was right; the documentation was wrong.
+  Figures 4 and 5 are unaffected.

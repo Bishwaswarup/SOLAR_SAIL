@@ -63,10 +63,25 @@ list[np.ndarray]:
     return crossings
 
 
-def match_manifolds(crossings_u: list[np.ndarray], crossings_s: list[np.ndarray], w_pos: float = 1000.0) -> tuple:
+def match_manifolds(crossings_u: list[np.ndarray], crossings_s: list[np.ndarray],
+                    w_pos: float = 1000.0,
+                    exclude_states: list[np.ndarray] | None = None,
+                    min_sep: float = 0.0) -> tuple:
     """
     Finds the best matching pair of states between an unstable and stable manifold
     on a Poincaré section by minimizing position residual and velocity difference (ΔV).
+
+    IMPORTANT — self-intersection
+    ─────────────────────────────
+    W^u and W^s of the *same* periodic orbit both contain that orbit, so if both
+    crossing lists are generated from a single orbit this function will return the
+    orbit's own self-intersection: dr → 0, dv → 0, and an apparently "free"
+    transfer that is not a transfer at all.  A genuine heteroclinic connection
+    requires TWO DISTINCT orbits, and by construction costs zero ΔV — any nonzero
+    result is a nearby non-heteroclinic transfer and must be described as such.
+
+    Use `exclude_states` + `min_sep` to forbid matches that sit on (or within
+    `min_sep` of) the originating orbits.
 
     Parameters
     ----------
@@ -77,21 +92,43 @@ def match_manifolds(crossings_u: list[np.ndarray], crossings_s: list[np.ndarray]
     w_pos : float, optional
         Weighting factor applied to the position residual to heavily penalize
         trajectories that don't meet at the same physical location.
+    exclude_states : list[np.ndarray], optional
+        States (e.g. the originating orbits' own section crossings) near which a
+        match is rejected.  Guards against returning a self-intersection.
+    min_sep : float, optional
+        Minimum non-dimensional distance a crossing must keep from every entry of
+        `exclude_states`.  Ignored when `exclude_states` is None.
 
     Returns
     -------
     tuple
         (best_indices, state_u, state_s, delta_v_vec)
         where best_indices is a tuple (i, j) of the best matching strand indices.
+
+    Raises
+    ------
+    ValueError
+        If either list is empty, or if the exclusion guard rejects every pair.
     """
     if not crossings_u or not crossings_s:
         raise ValueError("One or both crossing lists are empty.")
+
+    def _too_close(state: np.ndarray) -> bool:
+        if not exclude_states or min_sep <= 0.0:
+            return False
+        return any(np.linalg.norm(state[:3] - ex[:3]) < min_sep
+                   for ex in exclude_states)
 
     best_cost = np.inf
     best_pair = (None, None)
 
     for i, su in enumerate(crossings_u):
+        if _too_close(su):
+            continue
         for j, ss in enumerate(crossings_s):
+            if _too_close(ss):
+                continue
+
             # Position error (r_u - r_s)
             dr = np.linalg.norm(su[:3] - ss[:3])
 
@@ -106,6 +143,12 @@ def match_manifolds(crossings_u: list[np.ndarray], crossings_s: list[np.ndarray]
                 best_pair = (i, j)
 
     i, j = best_pair
+    if i is None:
+        raise ValueError(
+            "No admissible pair: the exclusion guard (min_sep="
+            f"{min_sep:g}) rejected every crossing. Either the manifolds have "
+            "not separated from their originating orbits within t_max, or both "
+            "crossing lists came from the same orbit.")
     best_su = crossings_u[i]
     best_ss = crossings_s[j]
 

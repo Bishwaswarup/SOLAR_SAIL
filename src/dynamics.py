@@ -1,6 +1,62 @@
 # Sun-Earth CR3BP EOM + sail acceleration
 import numpy as np
 
+
+def sail_frame(pos, mu: float):
+    """
+    Right-handed ORTHONORMAL sail frame {r_hat, p_hat, q_hat} at a position.
+
+        r_hat = (r - r_sun)/|r - r_sun|      radial, Sun to spacecraft
+        p_hat = (k x r_hat)/|k x r_hat|      transverse, in the ecliptic
+        q_hat = r_hat x p_hat                completes the right-handed triad
+
+    Why this exists (bug A1).  Earlier code built the frame as {r_hat, t_hat,
+    k_hat} with k_hat = [0,0,1] the GLOBAL z-axis.  That triad is NOT orthonormal
+    off the ecliptic: r_hat . k_hat = z/r1, which is nonzero whenever z != 0.  A
+    sail normal assembled from it,
+
+        n_hat = cos(a) r_hat + sin(a) cos(d) t_hat + sin(a) sin(d) k_hat
+
+    then has
+
+        |n_hat|^2 = 1 + sin(2a) sin(d) (z / r1)                            (A1)
+
+    so the "unit" normal is not unit, the thrust magnitude is wrong by that
+    factor, and the direction is not the one the angles (a, d) are supposed to
+    name.  Both errors vanish on the ecliptic (z = 0) and grow linearly in z/r1,
+    reaching 4.5 % in magnitude at z/r1 = 0.09.  Every off-plane result computed
+    with the old frame -- the reachable set, the control-authority map -- carried
+    that error; on-plane results and all face-on (alpha = 0) results did not,
+    because at alpha = 0 the normal is r_hat regardless of the other two vectors.
+
+    q_hat reduces to +k_hat exactly when z = 0, so this is a strict correction:
+    it changes nothing that was previously right.
+    """
+    r_vec = np.array([pos[0] + mu, pos[1], pos[2]], dtype=float)
+    r1 = float(np.linalg.norm(r_vec))
+    r_hat = r_vec / r1
+
+    k_hat = np.array([0.0, 0.0, 1.0])
+    p_hat = np.cross(k_hat, r_hat)
+    p_norm = float(np.linalg.norm(p_hat))
+    if p_norm > 1e-12:
+        p_hat = p_hat / p_norm
+    else:
+        # r_hat is parallel to k: pick any unit vector orthogonal to it.
+        p_hat = np.array([1.0, 0.0, 0.0])
+        p_hat = p_hat - (p_hat @ r_hat) * r_hat
+        p_hat = p_hat / np.linalg.norm(p_hat)
+    q_hat = np.cross(r_hat, p_hat)
+    return r_hat, p_hat, q_hat, r1
+
+
+def sail_normal(pos, alpha: float, delta: float, mu: float):
+    """Unit sail normal from cone and clock angles, in the orthonormal frame."""
+    r_hat, p_hat, q_hat, _ = sail_frame(pos, mu)
+    return (np.cos(alpha) * r_hat
+            + np.sin(alpha) * np.cos(delta) * p_hat
+            + np.sin(alpha) * np.sin(delta) * q_hat)
+
 def sail_acceleration(state: list[float], alpha: float, delta: float, beta: float, mu: float) -> list[float]:
     """
     Computes the non-dimensional solar sail acceleration vector in the Circular
@@ -39,24 +95,11 @@ def sail_acceleration(state: list[float], alpha: float, delta: float, beta: floa
     # Extracting the position
     x, y, z = state[0], state[1], state[2]
 
-    # Sun-to-spacecraft vector (Sun is at (-mu, 0, 0)):
-    r_vec = np.array([x + mu, y, z])
-    r1 = np.linalg.norm(r_vec)
-    r_hat = r_vec / r1
-
-    # Build the two perpendicular basis vectors:
-    k_hat = np.array([0., 0., 1.])
-    t_hat = np.cross(k_hat, r_hat)
-    t_norm = np.linalg.norm(t_hat) # for preventing diving by zero
-    if t_norm > 1e-12:
-        t_hat = t_hat / t_norm
-    else:
-        t_hat = np.array([1.0, 0.0, 0.0])
-
-    # Sail normal from cone and clock angles:
-    n_hat = (np.cos(alpha) * r_hat +
-             np.sin(alpha) * np.cos(delta) * t_hat +
-             np.sin(alpha) * np.sin(delta) * k_hat)
+    # Orthonormal sail frame and unit normal (see sail_frame on bug A1).
+    r_hat, p_hat, q_hat, r1 = sail_frame((x, y, z), mu)
+    n_hat = (np.cos(alpha) * r_hat
+             + np.sin(alpha) * np.cos(delta) * p_hat
+             + np.sin(alpha) * np.sin(delta) * q_hat)
 
     # Acceleration magnitude:
     a_mag = beta * (1 - mu) / (r1**2) * (np.cos(alpha)**2)

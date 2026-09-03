@@ -26,7 +26,6 @@ Figures produced
       Unit circle drawn for reference; multipliers plotted.
       This shows how sail tuning tames the unstable eigenvalue.
 
-  fig4_reachable_evolution.png
       Reachable acceleration set (‖a_sail‖ cloud) at the equilibrium point
       for β = 0.1, 0.3, 0.5 — shows how control authority grows with β.
 
@@ -36,11 +35,10 @@ Usage
     python src/paper_extras.py fig1    # single figure
     python src/paper_extras.py fig2
     python src/paper_extras.py fig3
-    python src/paper_extras.py fig4
 
 All functions are importable:
     from src.paper_extras import (
-        fig_beta_family, fig_stability_sweep, fig_floquet, fig_reachable)
+        fig_beta_family, fig_stability_sweep, fig_floquet)
 """
 
 import sys
@@ -61,7 +59,6 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from src.equilibria  import find_artificial_equilibrium
 from src.orbits      import compute_halo_orbit
 from src.manifolds   import compute_monodromy
-from src.sail_control import reachable_set
 from src.dynamics    import cr3bp_sail_eom
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -441,66 +438,6 @@ def fig_floquet(sweep=None, output='fig3_floquet.png', verbose=True):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 4 — reachable acceleration set evolution
-# ─────────────────────────────────────────────────────────────────────────────
-
-def fig_reachable_evolution(sweep=None,
-                            output='fig4_reachable_evolution.png',
-                            verbose=True):
-    """
-    Three-panel figure showing the reachable sail acceleration cloud at the
-    equilibrium point for β = 0.1, 0.3, 0.5.  Plotted in the ax–az plane
-    (x-component vs z-component of a_sail evaluated at L₁).
-    """
-    if sweep is None:
-        if verbose:
-            print("Computing β-sweep …")
-        sweep = _compute_sweep(verbose=verbose)
-
-    betas_show = [0.1, 0.3, 0.5]
-    colors     = ['steelblue', 'seagreen', 'darkorange']
-
-    _apply_style()
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.5))
-
-    for ax, bv, col in zip(axes, betas_show, colors):
-        idx = np.argmin(np.abs(sweep['betas'] - bv))
-        x_eq = sweep['x_eq'][idx]
-        eq   = [x_eq, 0.0, 0.0]
-
-        cloud = reachable_set(eq, bv, MU, n_alpha=60, n_delta=72)
-        # plot ax vs az (x-component vs z-component of acceleration)
-        ax.scatter(cloud[:, 0], cloud[:, 2],
-                   s=3, color=col, alpha=0.5, lw=0)
-
-        a_max = np.linalg.norm(cloud, axis=1).max()
-        ax.set_xlabel('aₓ  [non-dim]')
-        ax.set_ylabel('aᵤ  [non-dim]')
-        ax.set_title(f'β = {bv:.1f}   |a|_max = {a_max:.4f}')
-        ax.set_aspect('equal')
-        ax.axhline(0, color='grey', lw=0.5)
-        ax.axvline(0, color='grey', lw=0.5)
-
-        # annotate max radius
-        circle = plt.Circle((0, 0), a_max, fill=False,
-                             color=col, ls='--', lw=0.8, alpha=0.5)
-        ax.add_patch(circle)
-
-    fig.suptitle(
-        'Reachable sail-acceleration set at L₁ for different β\n'
-        '(ax vs az projection;  dashed circle = maximum magnitude)',
-        fontsize=10, y=1.02)
-    plt.tight_layout()
-    fig.savefig(output, dpi=200, bbox_inches='tight')
-    plt.close(fig)
-    if verbose:
-        print(f"  ✓  Saved → {output}")
-    return fig
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Figure 5 — LQR station-keeping (sub-L₁ sentinel)
-# ─────────────────────────────────────────────────────────────────────────────
 
 def fig_stationkeeping(output_prefix='fig5', verbose=True):
     """
@@ -733,10 +670,6 @@ if __name__ == '__main__':
     if which in ('fig3', 'all'):
         print("\n── Figure 3: Floquet multipliers ─────────────────")
         fig_floquet(sweep)
-
-    if which in ('fig4', 'all'):
-        print("\n── Figure 4: reachable-set evolution ─────────────")
-        fig_reachable_evolution(sweep)
 
     if which in ('fig5', 'all'):
         print("\n── Figure 5–7: LQR station-keeping ──────────────")

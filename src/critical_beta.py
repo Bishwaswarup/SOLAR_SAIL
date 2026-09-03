@@ -57,8 +57,15 @@ Two thresholds
 
           r2_crit = mu^(1/3)  =  3^(1/3) r_H  ~ 1.442 r_H                 (5)
 
-      For Sun-Earth this gives beta_crit ~ 0.0286 — inside the range of
-      *current* sail technology (beta ~ 0.01-0.05).
+      For Sun-Earth this gives beta_crit ~ 0.0286.  On what that means for
+      hardware, see sail_technology.py: reduced from primary specifications,
+      EVERY solar sail flown to date sits at beta <= 0.0061 (IKAROS 0.00062 from
+      its measured 1.12 mN thrust; LightSail-2 0.0061; ACS3 0.0048), and the most
+      ambitious funded design, the cancelled Solar Cruiser, reached 0.0202.  So
+      tidal parity is a factor of ~3 beyond the best FLOWN sail and within 40 %
+      of a designed one — near-term, NOT current, capability.  An earlier version
+      of this docstring claimed "inside the range of *current* sail technology
+      (beta ~ 0.01-0.05)"; that band was unsourced and is not supported.
 
       Threshold (B) has a CLOSED FORM.  Impose r2 = mu^(1/3) on the on-axis
       balance  x - (1-beta)(1-mu)/r1^2 + mu/r2^2 = 0,  where r1 = x + mu and

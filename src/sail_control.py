@@ -1,7 +1,7 @@
 # Cone/clock angle scheduling, optimal law
 import numpy as np
 from scipy.integrate import solve_ivp
-from .dynamics import sail_acceleration, cr3bp_sail_eom
+from .dynamics import sail_acceleration, cr3bp_sail_eom, sail_frame
 
 
 def optimal_sail_angles(state: list[float], target_dir: list[float], beta: float, mu: float) -> tuple[
@@ -36,23 +36,18 @@ def optimal_sail_angles(state: list[float], target_dir: list[float], beta: float
         return 0.0, 0.0, np.zeros(3)
     d_hat = d_hat / d_norm
 
-    # Build local sail frame {r_hat, t_hat, k_hat}
-    r_vec = np.array([x + mu, y, z])
-    r1 = np.linalg.norm(r_vec)
-    r_hat = r_vec / r1
-
-    k_hat = np.array([0.0, 0.0, 1.0])
-    t_hat = np.cross(k_hat, r_hat)
-    t_norm = np.linalg.norm(t_hat)
-    if t_norm > 1e-12:
-        t_hat = t_hat / t_norm
-    else :
-        t_hat = np.array([1.0, 0.0, 0.0])
+    # Build the local ORTHONORMAL sail frame {r_hat, p_hat, q_hat}.
+    # Previously this used {r_hat, t_hat, k_hat} with k_hat the global z-axis,
+    # which is not orthonormal off the ecliptic (r_hat . k_hat = z/r1) -- bug
+    # A1.  Projecting a target direction onto a non-orthogonal triad gives
+    # components that do not reconstruct the vector, so the "optimal" angles
+    # were wrong off-plane.  See dynamics.sail_frame for the full statement.
+    r_hat, p_hat, q_hat, r1 = sail_frame((x, y, z), mu)
 
     # Project target direction into the local frame
     d_r = np.dot(d_hat, r_hat)
-    d_t = np.dot(d_hat, t_hat)
-    d_k = np.dot(d_hat, k_hat)
+    d_t = np.dot(d_hat, p_hat)
+    d_k = np.dot(d_hat, q_hat)
 
     # Optimal Clock Angle (delta*)
     # delta* maximizes the transverse/normal projection: sin(delta)*d_k + cos(delta)*d_t

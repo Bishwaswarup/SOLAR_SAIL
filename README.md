@@ -39,7 +39,22 @@ $$s(\beta) = \mu / r_2^3, \qquad A(\beta) = \tfrac{(1-\beta)(1-\mu)}{r_1^{3}} + 
 | **Hill-sphere exit** | r₂ = r_H = (μ/3)^(1/3) | **2.98 × 10⁻⁴** | 1.00 r_H |
 | **Tidal parity** | s = 1, i.e. r₂ = μ^(1/3) | **0.02865** | 3^(1/3) r_H = 1.442 r_H |
 
-The tidal-parity threshold has an exact closed form, **r₂ = μ^(1/3) = 3^(1/3) r_H**, and for the Sun–Earth system it lands at **β ≈ 0.0286 — inside the range of present-day sail technology (β ~ 0.01–0.05).** Existing sails already sit at the boundary where the Sun–Earth collinear structure ceases to be dynamically meaningful. That is the publishable statement.
+The tidal-parity threshold has an exact closed form. Imposing r₂ = μ^(1/3) on the on-axis balance cancels the (1−μ) factor identically, leaving
+
+**β_crit = 1 − (1 − μ^(1/3))² = μ^(1/3)(2 − μ^(1/3))**
+
+exactly — no expansion in μ, no root-finding. It therefore depends on the system *only* through μ^(1/3). For Sun–Earth it lands at **β ≈ 0.028646**.
+
+Where that sits against real hardware is a checkable question, and the answer is **not** "already achievable". Reduced from primary specifications ([`src/sail_technology.py`](src/sail_technology.py)), every solar sail ever flown sits at β ≤ 0.0061:
+
+| sail | β | note |
+|---|---|---|
+| IKAROS (2010) | 0.00062 | the only **measured** value — from JAXA's 1.12 mN |
+| ACS3 (2024) | 0.0048 | 80 m², 16 kg |
+| LightSail-2 (2019) | 0.0061 | 32 m², 5 kg — best flown |
+| Solar Cruiser | 0.0202 | design only, cancelled 2022 |
+
+So tidal parity is **≈ 3× beyond the best flown sail** and **within 40 % of the most ambitious funded design**. The defensible claim is that it lies at the edge of *near-term* capability — which is stronger than the unsourced version precisely because it can be checked.
 
 <div align="center"><img src="fig8_structure_dissolution.png" width="95%"/></div>
 
@@ -140,7 +155,7 @@ Force purely along the sail normal, magnitude ∝ cos²α. An earlier draft of t
 |---|---|---|
 | Cone angle | α | Sun-line to sail normal. α = 0 → face-on (max thrust); α = π/2 → edge-on |
 | Clock angle | δ | Azimuth of the normal about the sun-line |
-| Lightness number | β | SRP force / solar gravity. β ~ 0.01–0.05 current; β = 0.5 far-future |
+| Lightness number | β | SRP force / solar gravity. β ≤ 0.006 flown, 0.02 designed (see `sail_technology.py`); β = 0.5 far-future |
 
 Membrane billow, finite slew rate and self-shadowing are not modelled; see Dachwald et al. on why non-ideal optics matter more than that estimate suggests.
 
@@ -168,18 +183,17 @@ Membrane billow, finite slew rate and self-shadowing are not modelled; see Dachw
 
 <div align="center"><img src="fig3_floquet.png" width="75%"/></div>
 
-**Figure 4 — Reachable acceleration set vs β.** Ideal-reflector off-axis behaviour, cos²α along the normal.
+**Figure 5 — Sail control authority.** Built on the true 6×2 sail Jacobian ∂**a**/∂(α, δ), replacing the earlier LQR suite that was computed on a 6×3 unconstrained thruster and therefore described a spacecraft a sail cannot be.
 
-<div align="center"><img src="fig4_reachable_evolution.png" width="80%"/></div>
+The result: **α₀ = 0 is a singular nominal for sail station-keeping.** At face-on, ∂**a**/∂δ vanishes identically — the clock angle only rotates a normal already parallel to **r̂** — so the sail is a one-input system whose single direction is fixed by a constant δ. The Kalman rank is 4/6: the in-plane pair is reachable (Coriolis carries a transverse input into the radial direction, rank 4/4), but the decoupled vertical mode is not. Any α₀ > 0 restores rank 6.
 
-**Figure 5 — Station-keeping suite.** Minimum β for LQR stability, control-authority map, closed-loop LQR simulation, and the sensitivity-matrix corrector. Valid as controller demonstrations; the β = 0.5 nominal should be read as a hovering point.
+Authority peaks at **α₀\* = arctan(1/√2) = 35.264°**, where σ₂/σ₁ = 1/3 and cos²α₀\* = 2/3, both exactly. That angle is the classical optimal sail cone angle (McInnes 1999 §2.6) — recovering it from the control Jacobian is a benchmark check, not a new result; what is new is that it also maximises out-of-plane control authority, and that the authority vanishes at α₀ = 0.
 
-<div align="center">
-<img src="fig5_minimum_beta.png" width="49%"/> <img src="fig5_control_authority.png" width="49%"/>
-<img src="fig5_simulation.png" width="49%"/> <img src="fig5_station_keeping.png" width="49%"/>
-</div>
+<div align="center"><img src="fig5_control_authority.png" width="88%"/></div>
 
-**Figures 6–7 — deleted.** They were built on the spurious L₂ orbit and have been removed rather than shipped with a caveat. See *Earth–Moon* above for the corrected setup they must be regenerated from.
+`fig5_minimum_beta.png` and `fig5_simulation.png` have been **deleted** — both were LQR results on the fictitious thruster. `fig5_station_keeping.png` (the sensitivity-matrix corrector) survives: it perturbs the actual sail angles and is genuine sail control.
+
+**Figures 6–7 — Earth–Moon, out of scope.** Regenerated at a properly energy-matched pair with the self-intersection guard, but the transfer ΔV does not converge with manifold sampling (1891 → 2637 → 1929 → 388 m/s), so no ΔV is quoted. Reachable via `python main.py earthmoon`; excluded from the paper set.
 
 ---
 

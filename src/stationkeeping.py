@@ -61,12 +61,29 @@ AU_KM           = 1.496e8
 DAYS_PER_NONDIM = 365.25 / (2 * np.pi)
 VEL_KMS         = 29.7847            # 1 non-dim vel = 29.78 km/s
 
-# B matrix: sail adds acceleration to the last three state components (ẍ, ÿ, z̈)
-# 6×3 — control is a 3-vector [uₓ, u_y, u_z]
-B_CTRL = np.zeros((6, 3))
-B_CTRL[3, 0] = 1.0
-B_CTRL[4, 1] = 1.0
-B_CTRL[5, 2] = 1.0
+# ── Control model: AN IDEAL THRUSTER, NOT A SAIL (bug A3) ─────────────────────
+# This 6x3 declares an unconstrained three-axis thruster: any direction, any
+# sign, magnitude decoupled from direction, saturated only in norm.  A solar
+# sail has TWO inputs (alpha, delta), can push only away from the Sun, and has
+# its direction rigidly coupled to its magnitude through cos^2(alpha).  Note
+# also that alpha/delta never enter eom_controlled below: the sail is held at
+# its nominal and this control is added beside it as a separate acceleration,
+# so nothing in the loop is sail attitude control.
+#
+# The consequence is not cosmetic.  With the true 6x2 sail Jacobian, the
+# face-on nominal (alpha0 = 0) is UNCONTROLLABLE -- rank 4/6, because
+# da/ddelta = 0 there and the decoupled z mode cannot be reached.  Any
+# alpha0 != 0 restores rank 6.  See src/sail_authority.py for the derivation,
+# the Kalman rank table and sail_control_jacobian().
+#
+# Kept under its original name so the existing figures still reproduce
+# bit-for-bit, but it must not be described as a sail in any caption or text.
+B_THRUSTER_IDEAL = np.zeros((6, 3))
+B_THRUSTER_IDEAL[3, 0] = 1.0
+B_THRUSTER_IDEAL[4, 1] = 1.0
+B_THRUSTER_IDEAL[5, 2] = 1.0
+
+B_CTRL = B_THRUSTER_IDEAL          # legacy alias; same object, honest name above
 
 
 # ─────────────────────────────────────────────────────────────────────────────

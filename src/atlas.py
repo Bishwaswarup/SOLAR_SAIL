@@ -4,7 +4,9 @@ atlas.py — halo family atlas over the technologically relevant sail band,
 
 Why this band
 ─────────────
-Flown and near-term solar sails sit at beta of order 1e-3 to 5e-2.  Below it the
+Flown solar sails sit at beta of 6e-4 to 6e-3 (sail_technology.py, reduced from
+primary specifications); designed but unflown ones reach 2e-2.  This band spans
+both and extends a little beyond, to 5e-2.  Below it the
 sail is irrelevant; above it, critical_beta.py shows the collinear structure has
 already dissolved (tidal parity at beta = 0.0286, and by beta = 0.5 the
 equilibrium is 20.6 Hill radii out and the dynamics are Keplerian).  So this band
@@ -58,6 +60,7 @@ def build(betas=None, mu: float = MU_SE,
           ds_over_gamma: float = 0.02, n_steps: int = 70,
           az_max_over_gamma: float = 1.0,
           max_dx_over_gamma: float = MAX_DX_OVER_GAMMA,
+          chain_beta: bool = True,
           verbose: bool = True) -> dict:
     """
     Walk the halo family at each beta.  Returns {beta: branch_dict} plus meta.
@@ -75,42 +78,121 @@ def build(betas=None, mu: float = MU_SE,
         5 gamma, far outside the local family.
       * `max_dx_over_gamma` — the hard far-field guard in continue_branch,
         which is normally what terminates each branch.
+
+    Branch continuity ACROSS beta (`chain_beta`)
+    ────────────────────────────────────────────
+    Pseudo-arclength keeps a single family on its branch as Az varies, but an
+    earlier version called find_halo_seed independently at every beta, and that
+    function returns the FIRST amplitude passing require_halo.  Nothing then tied
+    consecutive beta to the same branch, and at beta = 0.040 the scan landed on a
+    different one: x0 sat Earthward of x_eq instead of sunward (and crossed
+    x = 1), the z-asymmetry delta was negative where every neighbour was
+    positive, and the branch died after 43 members against 69 either side.  One
+    of twelve atlas curves was a different family.
+
+    With chain_beta the first beta is bootstrapped by find_halo_seed and every
+    later beta is seeded from its predecessor's converged state, with z0 rescaled
+    by gamma_new/gamma_old so Az/gamma is preserved across the step.  The atlas is
+    then one connected sheet rather than twelve independent walks.  Two guards
+    verify it afterwards: sign(delta) must match the reference beta, and the
+    family must sit sunward of the equilibrium (x0 < x_eq).  A beta that fails
+    either is re-seeded from scratch and, if it still fails, recorded in
+    `suspect` rather than silently shipped.
     """
     if betas is None:
         betas = DEFAULT_BETAS
 
-    families, failed = {}, []
+    families, failed, suspect = {}, [], []
+    prev = None          # (state0, T_half, gamma) of the last accepted beta
+    ref_delta_sign = 0   # branch reference, set by the first accepted beta
+
+    def _walk(eq, gamma, b, seed):
+        return continue_branch(eq, mu, param='Az',
+                               seed_state=seed, other=float(b),
+                               ds=ds_over_gamma * gamma,
+                               ds_min=1e-4 * gamma,
+                               ds_max=0.2 * gamma,
+                               n_steps=n_steps,
+                               lam_bounds=(1e-3 * gamma,
+                                           az_max_over_gamma * gamma),
+                               max_dx_over_gamma=max_dx_over_gamma,
+                               with_stability=True, verbose=False)
+
+    def _bootstrap(eq, b, gamma):
+        s0, Th0, Az0 = find_halo_seed(eq, mu, beta=float(b),
+                                      max_dx_over_gamma=max_dx_over_gamma,
+                                      verbose=False)
+        return (s0, Th0), float(Az0)
+
+    def _branch_ok(br, eq):
+        """(ok, reason).  Checks branch identity against the reference."""
+        med = float(np.median(br['delta']))
+        if ref_delta_sign and np.sign(med) != ref_delta_sign:
+            return False, f'delta sign {np.sign(med):+.0f} vs ref {ref_delta_sign:+.0f}'
+        if np.any(br['x0'] >= eq[0]):
+            return False, 'x0 reaches or exceeds x_eq (not sunward)'
+        return True, ''
+
     for b in np.asarray(betas, dtype=float):
         eq = [equilibrium(float(b), mu), 0.0, 0.0]
         gamma = local_scale(eq, mu)
         if verbose:
             print(f"  beta = {b:.4f}   x_eq = {eq[0]:.8f}   "
                   f"gamma = {gamma:.6f}")
-        try:
-            s0, Th0, Az0 = find_halo_seed(eq, mu, beta=float(b),
-                                          max_dx_over_gamma=max_dx_over_gamma,
-                                          verbose=verbose)
-        except RuntimeError as e:
-            if verbose:
-                print(f"      no halo seed: {str(e)[:70]}")
-            failed.append((float(b), 'no seed'))
+
+        # -- choose a seed: chained from the previous beta, else bootstrap ----
+        seed, Az0, how = None, float('nan'), ''
+        if chain_beta and prev is not None:
+            s_prev, Th_prev, g_prev = prev
+            s_try = np.array(s_prev, dtype=float).copy()
+            s_try[2] *= gamma / g_prev          # preserve Az/gamma
+            seed, Az0, how = (s_try, Th_prev), float(abs(s_try[2])), 'chained'
+        if seed is None:
+            try:
+                seed, Az0 = _bootstrap(eq, b, gamma)
+                how = 'bootstrap'
+            except RuntimeError as e:
+                if verbose:
+                    print(f"      no halo seed: {str(e)[:70]}")
+                failed.append((float(b), 'no seed'))
+                continue
+
+        # -- walk, with one re-seed if the chained seed fails or drifts -------
+        br = None
+        for attempt in range(2):
+            try:
+                cand = _walk(eq, gamma, b, seed)
+            except RuntimeError as e:
+                cand, why = None, f'continuation failed: {str(e)[:50]}'
+            else:
+                ok, why = _branch_ok(cand, eq)
+                if ok:
+                    br = cand
+                    break
+                cand = None
+            if attempt == 0 and how == 'chained':
+                if verbose:
+                    print(f"      chained seed rejected ({why}); re-seeding")
+                try:
+                    seed, Az0 = _bootstrap(eq, b, gamma)
+                    how = 'bootstrap(after chain)'
+                except RuntimeError:
+                    break
+            else:
+                if verbose:
+                    print(f"      branch guard: {why}")
+                suspect.append((float(b), why))
+                br = cand
+                break
+
+        if br is None:
+            failed.append((float(b), 'continuation/guard'))
             continue
-        try:
-            br = continue_branch(eq, mu, param='Az',
-                                 seed_state=(s0, Th0), other=float(b),
-                                 ds=ds_over_gamma * gamma,
-                                 ds_min=1e-4 * gamma,
-                                 ds_max=0.2 * gamma,
-                                 n_steps=n_steps,
-                                 lam_bounds=(1e-3 * gamma,
-                                             az_max_over_gamma * gamma),
-                                 max_dx_over_gamma=max_dx_over_gamma,
-                                 with_stability=True, verbose=False)
-        except RuntimeError as e:
-            if verbose:
-                print(f"      continuation failed: {str(e)[:70]}")
-            failed.append((float(b), 'continuation'))
-            continue
+
+        if not ref_delta_sign:
+            ref_delta_sign = int(np.sign(np.median(br['delta'])))
+        br['seeded_by'] = how
+        prev = (br['state0'][0], br['T'][0] / 2.0, gamma)
 
         br['Az_seed'] = float(Az0)
         families[float(b)] = br
@@ -123,11 +205,13 @@ def build(betas=None, mu: float = MU_SE,
                   f"nu_max [{np.nanmin(br['nu_max']):.2f}, "
                   f"{np.nanmax(br['nu_max']):.2f}] | "
                   f"{len(br['folds'])} folds | {ns} stable")
-            print(f"      stop: {br['stopped']}")
+            print(f"      stop: {br['stopped']}   seed: {br['seeded_by']}")
 
-    return dict(families=families, failed=failed, mu=mu,
+    return dict(families=families, failed=failed, suspect=suspect, mu=mu,
                 beta_tidal=critical_beta_tidal(mu),
-                max_dx_over_gamma=max_dx_over_gamma)
+                max_dx_over_gamma=max_dx_over_gamma,
+                chain_beta=chain_beta,
+                ref_delta_sign=ref_delta_sign)
 
 
 def summarise(atlas: dict) -> None:
@@ -241,8 +325,8 @@ def fig_atlas(output: str = 'fig10_halo_atlas.png',
     ax.set_ylabel(r'$A_z$  [nd]')
     panel_label(ax, '(d)')
 
-    fig.suptitle(r'Sun--Earth halo families across the flown sail band, '
-                 r'$\beta \in [0.001,\,0.05]$,  $\alpha = 0$',
+    fig.suptitle(r'Sun--Earth halo families across the flown and near-term '
+                 r'sail band, $\beta \in [0.001,\,0.05]$,  $\alpha = 0$',
                  fontsize=9.5, y=0.999)
     fig.tight_layout(rect=[0, 0, 1, 0.965])
     fig.savefig(output)
@@ -261,7 +345,7 @@ def export_csv(atlas: dict, path: str = 'halo_atlas.csv') -> str:
         w.writerow(['beta', 'gamma', 'Az', 'Az_over_gamma',
                     'C_sail', 'C_sail_eq', 'dC_from_eq',
                     'T_nd', 'T_days', 'x0', 'x_eq', 'dx_over_gamma', 'vy0',
-                    'nu_max', 'lambda_max', 'delta', 'stable'])
+                    'nu_max', 'lambda_max', 'delta', 'stable', 'seeded_by'])
         for b in sorted(atlas['families']):
             br = atlas['families'][b]
             g = br['gamma']
@@ -279,7 +363,8 @@ def export_csv(atlas: dict, path: str = 'halo_atlas.csv') -> str:
                             f"{br['nu_max'][i]:.6f}",
                             f"{br['lambda_max'][i]:.6f}",
                             f"{br['delta'][i]:.8f}",
-                            int(br['stable'][i])])
+                            int(br['stable'][i]),
+                            br.get('seeded_by', '')])
     return path
 
 

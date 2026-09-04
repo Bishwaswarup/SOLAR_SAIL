@@ -53,13 +53,16 @@ the closed form
 $\beta_{\mathrm{crit}}=1-\bigl(1-\mu^{1/3}\bigr)^2=2\mu^{1/3}-\mu^{2/3}$,
 exact for every mass ratio and verified against independent root-finding to
 \num{2.1e-16} over $\mu\in[10^{-7},10^{-2}]$. For Sun--Earth this gives
-$\beta_{\mathrm{crit}}=0.0286$. Second, the ratio of the out-of-plane to
-in-plane linear frequencies at any collinear equilibrium is confined to
-$\nu/\omega\in[2\sqrt2/3,\,1)$, a band \SI{5.72}{\percent} wide containing no
-low-order rational; the bound is attained exactly at $A=8/5$, where the three
-linear rates stand in the ratio
-$\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both $A=8/5$ and the bound are independent
-of $\mu$. We emphasise that neither result is a bifurcation: the saddle persists
+$\beta_{\mathrm{crit}}=0.0286$. Second, writing $c_2$ for the second Legendre
+coefficient of the collinear expansion --- the quantity a sail detunes
+continuously, and which is otherwise fixed by the mass ratio and the choice of
+point --- the ratio of the out-of-plane to in-plane linear frequencies at any
+collinear equilibrium is confined to $\nu/\omega\in[2\sqrt2/3,\,1)$, a band
+\SI{5.72}{\percent} wide containing no low-order rational. The bound is attained
+exactly at $c_2=8/5$, where the three linear rates stand in the ratio
+$\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both $c_2=8/5$ and the bound are independent
+of $\mu$. That the two frequencies are nearly equal at collinear points has been
+remarked upon~\cite{ceccaroni2016}; we make the statement exact. We emphasise that neither result is a bifurcation: the saddle persists
 for all $\beta$ and the degeneration is smooth, so these are exact structural
 landmarks rather than dynamical transitions, and we show by explicit search that
 no commensurability exists anywhere to make one. Reducing $\beta$ from primary
@@ -73,8 +76,8 @@ restores controllability.
 \end{abstract}
 
 \noindent\textbf{Keywords:} solar sail; restricted three-body problem;
-artificial equilibria; collinear points; Hill radius; halo orbits;
-controllability
+artificial equilibria; collinear points; Legendre coefficient $c_2$;
+Hill radius; halo orbits; controllability
 
 % =====================================================================
 \section{Introduction}
@@ -111,7 +114,7 @@ Section~\ref{sec:dissolution} defines the saddle strength $s=\mu/r_2^3$ and
 measures its four-decade collapse. Section~\ref{sec:closed} derives the exact
 tidal-parity threshold, the paper's principal result, and validates it across
 five decades of mass ratio. Section~\ref{sec:freq} establishes the frequency
-bound $\nu/\omega\in[2\sqrt2/3,1)$, locates its exact extremum at $A=8/5$, and
+bound $\nu/\omega\in[2\sqrt2/3,1)$, locates its exact extremum at $c_2=8/5$, and
 reports a systematic negative: no low-order resonance is attainable anywhere,
 which is what forbids interpreting either threshold as a bifurcation.
 Section~\ref{sec:families} tracks the halo families across the flown sail band
@@ -266,7 +269,24 @@ $U_{xx}=1+2A$, $U_{yy}=1-A$, $U_{zz}=-A$ with
            + \underbrace{\frac{\mu}{r_2^{3}}}_{\textstyle s} .
   \label{eq:A}
 \end{equation}
-The out-of-plane motion is a pure oscillator, $\nu=\sqrt{A}$. The in-plane
+This $A$ is not a new quantity. Setting $\beta=0$ and using
+$r_1+r_2=1$, \eqref{eq:A} reduces to
+$\mu/\gamma^{3}+(1-\mu)/(1-\gamma)^{3}$ with $\gamma=r_2$, which is exactly the
+second Legendre coefficient $c_2$ of the collinear expansion introduced by
+Richardson~\cite{richardson1980} and used throughout halo-orbit theory
+\cite{gomez2001,ceccaroni2016}. We verify the identity numerically to machine
+zero at Sun--Earth, Earth--Moon and Sun--Jupiter. We therefore write
+\begin{equation}
+  A \equiv c_2 ,
+  \label{eq:Ac2}
+\end{equation}
+and use $c_2$ from here on. The sail's effect is to replace $(1-\mu)$ by
+$(1-\beta)(1-\mu)$ in that coefficient: \emph{a solar sail continuously detunes
+$c_2$}, which is otherwise fixed once the system and the libration point are
+chosen. This is the compact statement of what a sail contributes, and we return
+to it in Section~\ref{sec:freq}.
+
+The out-of-plane motion is a pure oscillator, $\nu=\sqrt{c_2}$. The in-plane
 characteristic polynomial is
 \begin{equation}
   \lambda^{4} + (2-A)\lambda^{2} + \bigl(1+A-2A^{2}\bigr) = 0 ,
@@ -280,12 +300,12 @@ $\omega$,
   \omega^{2} = \tfrac12\bigl[D-(A-2)\bigr].
   \label{eq:rates}
 \end{equation}
-A real hyperbolic pair requires $A>1$.
+A real hyperbolic pair requires $c_2>1$.
 
 As the equilibrium recedes from the smaller primary, $r_1^3\to(1-\beta)(1-\mu)$
 by~\eqref{eq:hover} and hence $S\to1$, so
 \begin{equation}
-  A - 1 \;\longrightarrow\; s = \frac{\mu}{r_2^{3}} .
+  c_2 - 1 \;\longrightarrow\; s = \frac{\mu}{r_2^{3}} .
   \label{eq:As}
 \end{equation}
 We call $s$ the \emph{saddle strength}. Because $s>0$ for all finite $r_2$, the
@@ -295,9 +315,9 @@ records that rate; $s$ falls four decades between $\beta=0$ and $\beta=0.5$.
 
 It is worth being precise about~\eqref{eq:As}, because the convergence is slower
 than it looks. At tidal parity, $S=(1-\mu)/(1-\mu^{1/3})=1.014635$ exactly, so
-$A=2.014635$ rather than $2$, and $\lambda_u=1.505418$ rather than
-$5^{1/4}=1.495349$. The identification $A-1=s$ carries an $O(\mu^{1/3})$ error,
-\SI{0.73}{\percent} in $A$ at the Sun--Earth threshold. Both terms
+$c_2=2.014635$ rather than $2$, and $\lambda_u=1.505418$ rather than
+$5^{1/4}=1.495349$. The identification $c_2-1=s$ carries an $O(\mu^{1/3})$ error,
+\SI{0.73}{\percent} in $c_2$ at the Sun--Earth threshold. Both terms
 in~\eqref{eq:A} are nonetheless of smaller-primary origin: with the primary
 deleted, $S=1$ identically, so $S-1$ measures its indirect effect through the
 displacement of the equilibrium, while $s$ measures the direct tidal term. We
@@ -340,7 +360,7 @@ therefore write $A-1=(S-1)+s$ and use the exact $A$ throughout.
 \end{figure}
 
 Two consequences of Figure~\ref{fig:dissolution}(d) deserve emphasis, because
-both have been misread in the past. As $A\to1$ the planar roots
+both have been misread in the past. As $c_2\to1$ the planar roots
 of~\eqref{eq:quartic} become $\lambda^{2}\in\{0,-1\}$ and $\nu=\sqrt{A}\to1$,
 so the in-plane period is driven to exactly $2\pi$ in non-dimensional units ---
 one year for Sun--Earth. This is \emph{forced}, not resonant: in an inverse
@@ -392,7 +412,7 @@ expansion in $\mu$. To leading order $\beta_{\mathrm{crit}}\simeq2\mu^{1/3}$.
 
 The same substitution gives the linear structure at parity in closed form,
 \begin{equation}
-  A_{\mathrm{parity}} = 1 + \frac{1-\mu}{1-\mu^{1/3}} ,
+  c_2^{\mathrm{parity}} = 1 + \frac{1-\mu}{1-\mu^{1/3}} ,
   \label{eq:Aparity}
 \end{equation}
 which for Sun--Earth is $2.014635$, the value quoted in
@@ -435,7 +455,7 @@ sphere, so the Hill-sphere exit criterion $r_2=r_H$ is reached almost
 immediately, at $\beta=\num{2.9814e-4}$, and is not a useful discriminant.
 
 % =====================================================================
-\section{The frequency ratio: a universal bound}\label{sec:freq}
+\section{The frequency ratio: a universal bound on \texorpdfstring{$c_2$}{c2}}\label{sec:freq}
 % =====================================================================
 
 The threshold~\eqref{eq:closed} is a level crossing of a smooth monotone
@@ -448,16 +468,20 @@ together with an exact extremum that does.
 \subsection{The bound and its extremum}
 
 From~\eqref{eq:rates}, the ratio of the out-of-plane to in-plane frequency
-depends on $A$ alone,
+depends on $c_2$ alone,
 \begin{equation}
-  \frac{\nu^{2}}{\omega^{2}} = \frac{2A}{D-(A-2)},
-  \qquad D=\sqrt{A(9A-8)} .
+  \frac{\nu^{2}}{\omega^{2}} = \frac{2c_2}{D-(c_2-2)},
+  \qquad D=\sqrt{c_2(9c_2-8)} .
   \label{eq:R}
 \end{equation}
-Differentiating, the stationarity condition reduces to $D=2A$, i.e.
-$9A^{2}-8A=4A^{2}$, giving
+The two frequencies in~\eqref{eq:rates} are standard --- they appear in this
+form in~\cite{gomez2001} and~\cite{ceccaroni2016} --- but their ratio is, to our
+knowledge, not formed anywhere. Doing so is what follows.
+
+Differentiating~\eqref{eq:R}, the stationarity condition reduces to $D=2c_2$,
+i.e. $9c_2^{2}-8c_2=4c_2^{2}$, giving
 \begin{equation}
-  \boxed{\;A_\star = \tfrac{8}{5}\;}
+  \boxed{\;c_2^\star = \tfrac{8}{5}\;}
   \label{eq:Astar}
 \end{equation}
 and there, from~\eqref{eq:rates},
@@ -470,29 +494,36 @@ and there, from~\eqref{eq:rates},
   \label{eq:789}
 \end{equation}
 \begin{equation}
-  \left.\frac{\nu}{\omega}\right|_{A_\star} = \sqrt{\tfrac{8}{9}}
+  \left.\frac{\nu}{\omega}\right|_{c_2^\star} = \sqrt{\tfrac{8}{9}}
   = \frac{2\sqrt2}{3} = 0.942809041582\ldots
   \label{eq:bound}
 \end{equation}
-Over the whole physically admissible range $A>1$ the ratio is confined to
+Over the whole physically admissible range $c_2>1$ the ratio is confined to
 \begin{equation}
   \frac{\nu}{\omega} \in \Bigl[\tfrac{2\sqrt2}{3},\,1\Bigr) ,
   \label{eq:band}
 \end{equation}
 a band \SI{5.72}{\percent} wide, approaching unity in the hovering limit
-$A\to1$ and again as $A\to\infty$. Numerically, a $4\times10^{5}$-point scan
-places the minimum at $A=1.60000000$ with value $0.942809041582$, agreeing
+$c_2\to1$ and again as $c_2\to\infty$. Numerically, a $4\times10^{5}$-point scan
+places the minimum at $c_2=1.60000000$ with value $0.942809041582$, agreeing
 with~\eqref{eq:Astar} and~\eqref{eq:bound} to \num{8.1e-10} and \num{1.1e-16}
-respectively. Note that $A_\star$, the ratios~\eqref{eq:789} and the
+respectively. Note that $c_2^\star$, the ratios~\eqref{eq:789} and the
 bound~\eqref{eq:bound} contain no reference to $\mu$: they are properties of the
 collinear linearisation itself, shared by every three-body system.
+
+The narrowness of~\eqref{eq:band} has been observed qualitatively. Ceccaroni
+\emph{et al.}~\cite{ceccaroni2016}, sweeping all three collinear points over the
+full range $\mu\in(0,\tfrac12]$, note that the centre-manifold dynamics is
+``characterized by almost equal values of the frequencies for all mass
+ratios''. Equations~\eqref{eq:band} and~\eqref{eq:bound} make that observation
+exact and supply the constant it is missing.
 
 \subsection{No low-order resonance is attainable}
 
 We tested fourteen low-order rationals --- $1{:}2$, $2{:}3$, $3{:}4$, $4{:}5$,
 $5{:}6$, $8{:}9$, $1{:}1$, $9{:}8$, $6{:}5$, $5{:}4$, $4{:}3$, $3{:}2$,
 $5{:}3$, $2{:}1$ --- against the band~\eqref{eq:band}. \emph{None} lies inside
-it. Since $\nu<\omega$ strictly for $A>1$, even the $1{:}1$ commensurability is
+it. Since $\nu<\omega$ strictly for $c_2>1$, even the $1{:}1$ commensurability is
 approached only asymptotically, as the equilibrium degenerates into the hovering
 point.
 
@@ -508,48 +539,53 @@ only. Halo families bifurcate from planar Lyapunov families at a
 commensurability of the \emph{nonlinear} frequencies, reached at finite
 amplitude; the classical $L_1$ has $\nu/\omega=0.9659$ and halo orbits exist
 there regardless. Nothing here constrains halo existence.
-Second, $A_\star$ is a stationary point, not a transition: the dynamics change
-character nowhere in $A$. Its value is that a stationary point is intrinsic ---
+Second, $c_2^\star$ is a stationary point, not a transition: the dynamics change
+character nowhere in $c_2$. Its value is that a stationary point is intrinsic ---
 it survives any smooth reparametrisation and any choice of units --- whereas a
 level crossing at $s=1$ does not.
 
 \subsection{What the sail contributes}
 
-It would be natural to suppose $A_\star=8/5$ inaccessible without continuous
-thrust, on the grounds that the classical collinear points have $A\geq4$. That
-is true only of $L_1$. Computing $A$ at all three classical collinear points
+It would be natural to suppose $c_2^\star=8/5$ inaccessible without continuous
+thrust, on the grounds that the classical collinear points have $c_2\geq4$. That
+is true only of $L_1$. Computing $c_2$ at all three classical collinear points
 over $\mu\in(0,\tfrac12]$ gives
 \begin{equation}
-  A(L_1)\in[4.042,\,8.000], \qquad
-  A(L_2)\in[1.570,\,3.959], \qquad
-  A(L_3)\in[1.000,\,1.570],
+  c_2(L_1)\in[4.042,\,8.000], \qquad
+  c_2(L_2)\in[1.570,\,3.959], \qquad
+  c_2(L_3)\in[1.000,\,1.570],
 \end{equation}
-so the classical problem covers $A<4$ freely at $L_2$ and $L_3$, and it
-\emph{does} attain $A_\star$: at $L_2$ with $\mu=0.480187660$, where
+so the classical problem covers $c_2<4$ freely at $L_2$ and $L_3$, and it
+\emph{does} attain $c_2^\star$: at $L_2$ with $\mu=0.480187660$, where
 $\nu/\omega$ equals~\eqref{eq:bound} to twelve digits. $L_3$ at $\mu=\tfrac12$
-reaches $A=1.569787$ and misses the bound by only \num{3.07e-5}.
+reaches $c_2=1.569787$ and misses the bound by only \num{3.07e-5} --- close
+enough that the near-coincidence is worth recording, since $L_3$ occupies
+precisely the interval in which the extremum lies.
 
-The sail's contribution is therefore \emph{tunability}, not exclusivity. At
-fixed $\mu$ it sweeps $A$ continuously through $(1,A_{\mathrm{classical}}]$.
-Sun--Earth classically offers only $A=4.060819$ at $L_1$, $3.940764$ at $L_2$
-and $1.000003$ at $L_3$; none is at the bound, and a sail at $\beta=0.040932$
-places that system exactly on it --- a factor $1.4289$ beyond tidal parity, at
-$s=0.5897$. Figure~\ref{fig:freq} collects all of this.
+The sail's contribution is therefore \emph{tunability}, not exclusivity, and
+\eqref{eq:Ac2} is the compact way to say it: at fixed $\mu$ a sail sweeps $c_2$
+continuously through $(1,c_2^{\mathrm{classical}}]$, whereas classically $c_2$
+is fixed once the system and the point are chosen. Sun--Earth classically offers
+only $c_2=4.060819$ at $L_1$, $3.940764$ at $L_2$ and $1.000003$ at $L_3$; none
+is at the bound, and a sail at $\beta=0.040932$ places that system exactly on it
+--- a factor $1.4289$ beyond tidal parity, at $s=0.5897$.
+Figure~\ref{fig:freq} collects all of this.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{fig4_frequency_ratio.png}
   \caption{The frequency ratio at collinear equilibria.
-  \textbf{(a)} $\nu/\omega$ against $A$, with the exact minimum
-  $2\sqrt2/3$ at $A=8/5$ and, in the reserved strip below, the ranges of $A$
+  \textbf{(a)} $\nu/\omega$ against $c_2$, with the exact minimum
+  $2\sqrt2/3$ at $c_2=8/5$ and, in the reserved strip below, the ranges of $c_2$
   reached by the three classical collinear points over $\mu\in(0,\tfrac12]$;
   the vertical placement of those bars is a layout choice and carries no value.
-  \textbf{(b)} The three linear rates, meeting the ratio $7:8:9$ at $A_\star$.
-  \textbf{(c)} The sail's tuning curve for Sun--Earth: $A(\beta)$ sweeps
-  continuously from the classical value down to unity, passing tidal parity and
-  then $A_\star$. Open markers give the three classical Sun--Earth values, none
-  of which is at the bound. \textbf{(d)} Classical $A$ against $\mu$ for all
-  three points; $A_\star$ is attained at $L_2$ for $\mu=0.4802$.}
+  \textbf{(b)} The three linear rates, meeting the ratio $7:8:9$ at
+  $c_2^\star$. \textbf{(c)} The sail's tuning curve for Sun--Earth:
+  $c_2(\beta)$ sweeps continuously from the classical value down to unity,
+  passing tidal parity and then $c_2^\star$. Open markers give the three
+  classical Sun--Earth values, none of which is at the bound.
+  \textbf{(d)} Classical $c_2$ against $\mu$ for all three points;
+  $c_2^\star$ is attained at $L_2$ for $\mu=0.4802$.}
   \label{fig:freq}
 \end{figure}
 
@@ -650,7 +686,7 @@ $\mathrm{d}(\cos^{3}\alpha)/\mathrm{d}\alpha\to0$ as $\alpha\to0$.
 
 Rank of $B$ is not the relevant test, because Coriolis coupling can carry a
 transverse input into the radial direction. Applying the Kalman rank condition
-to the linearised system at the $\beta=0.05$ equilibrium ($A=1.409194$):
+to the linearised system at the $\beta=0.05$ equilibrium ($c_2=1.409194$):
 
 \begin{center}
 \begin{tabular}{lcc}
@@ -793,7 +829,7 @@ $\eta=0.626$ in Table~\ref{tab:tech} is a single-mission proxy, not a general
 correction.
 
 \item \textbf{No bifurcation is claimed.} $s>0$ for all finite $r_2$, so the
-saddle persists; $A_\star$ is a stationary point of a smooth function. Both
+saddle persists; $c_2^\star$ is a stationary point of a smooth function. Both
 thresholds are exact structural landmarks, and the resonance search of
 Section~\ref{sec:freq} is what licenses that restraint.
 
@@ -823,14 +859,18 @@ verified to machine precision across five decades of $\mu$. For Sun--Earth it is
 $0.0286$, corresponding to a standoff of $3^{1/3}r_H$. The scale $\mu^{1/3}$ is
 not itself new; the exact sail parameter required to reach it is.
 
-The frequency ratio at any collinear equilibrium is confined to
-$\nu/\omega\in[2\sqrt2/3,1)$ and attains its bound at $A=8/5$, where the linear
-rates stand in the ratio $7:8:9$. Both are independent of $\mu$. No low-order
-rational lies in the band, so no commensurability underwrites either threshold,
-and we present them as scale markers rather than transitions. The sail's role is
-to tune $A$ continuously within a given system, reaching values --- including the
-bound, at $\beta=0.0409$ for Sun--Earth --- that that system's classical
-collinear points do not offer.
+The parameter $A$ of the collinear linearisation is exactly Richardson's
+second Legendre coefficient $c_2$, and a sail's effect is to detune it
+continuously. The frequency ratio at any collinear equilibrium is confined to
+$\nu/\omega\in[2\sqrt2/3,1)$ and attains its bound at $c_2=8/5$, where the
+linear rates stand in the ratio $7:8:9$. Both are independent of $\mu$. The
+near-equality of the two frequencies has been noted
+before~\cite{ceccaroni2016}; the bound and its extremum make it exact. No
+low-order rational lies in the band, so no commensurability underwrites either
+threshold, and we present them as scale markers rather than transitions. The
+sail's role is to tune $c_2$ within a given system, reaching values ---
+including the bound, at $\beta=0.0409$ for Sun--Earth --- that that system's
+classical collinear points do not offer.
 
 Finally, the face-on nominal is singular for station-keeping: the clock angle
 has no first-order authority, the Kalman rank is $4/6$, and a few degrees of

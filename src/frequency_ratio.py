@@ -357,10 +357,10 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
     thin_guide(ax, x=A_STAR)
     ax.annotate(r'$2\sqrt{2}/3$', xy=(2.75, NU_OMEGA_MIN + 0.0016),
                 fontsize=7.2)
-    ax.annotate(r'$A=8/5$', xy=(A_STAR + 0.15, 0.9885), fontsize=7.2)
+    ax.annotate(r'$c_2=8/5$', xy=(A_STAR + 0.15, 0.9885), fontsize=7.2)
     # attainable-A bands, drawn in a reserved strip; the y position is a
     # layout choice and carries no value.
-    ax.annotate('classical reach in $A$:', xy=(1.15, 0.9345), fontsize=6.8,
+    ax.annotate('classical reach in $c_2$:', xy=(1.15, 0.9345), fontsize=6.8,
                 color='0.25')
     for w, yo in (('L3', 0.0), ('L2', -0.0022), ('L1', -0.0044)):
         lo, hi = att['ranges'][w][0], att['ranges'][w][1]
@@ -370,14 +370,14 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
                     ha='right')
     ax.set_xlim(0.55, 8.3)
     ax.set_ylim(0.9255, 1.001)
-    ax.set_xlabel(r'$A$')
+    ax.set_xlabel(r'$c_2$')
     ax.set_ylabel(r'$\nu/\omega$')
     panel_label(ax, '(a)')
 
     # (b) the three rates and the 7:8:9 point -------------------------------
     ax = axes[0, 1]
     ax.plot(A, om, 'k-', lw=1.0, label=r'$\omega$')
-    l1, = ax.plot(A, nu, 'k-', lw=1.0, label=r'$\nu=\sqrt{A}$')
+    l1, = ax.plot(A, nu, 'k-', lw=1.0, label=r'$\nu=\sqrt{c_2}$')
     l1.set_dashes([5, 2])
     l2, = ax.plot(A, lu, 'k-', lw=1.0, label=r'$\lambda_u$')
     l2.set_dashes([1, 1.6])
@@ -389,7 +389,7 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
     ax.annotate(r'$\lambda_u^2:\nu^2:\omega^2 = 7:8:9$',
                 xy=(A_STAR + 0.25, 1.05), fontsize=7.0)
     ax.set_xlim(1, 8.2)
-    ax.set_xlabel(r'$A$')
+    ax.set_xlabel(r'$c_2$')
     ax.set_ylabel('linear rate  [nd]')
     ax.legend(loc='upper left', fontsize=7.2)
     panel_label(ax, '(b)')
@@ -399,7 +399,7 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
     ax.semilogx(betas, A_beta, 'k-', lw=1.0)
     thin_guide(ax, y=A_STAR)
     thin_guide(ax, x=b_star)
-    ax.annotate(rf'$A=8/5$ at $\beta={b_star:.4f}$',
+    ax.annotate(rf'$c_2=8/5$ at $\beta={b_star:.4f}$',
                 xy=(4e-5, A_STAR + 0.16), fontsize=7.0)
     thin_guide(ax, x=b_tide)
     ax.annotate(rf'tidal parity' + '\n' + rf'$\beta={b_tide:.4f}$',
@@ -411,7 +411,7 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
         ax.annotate(w, xy=(2.3e-5, classical_A(w, mu) + yo - 0.05),
                     fontsize=6.6)
     ax.set_xlabel(r'$\beta$')
-    ax.set_ylabel(r'$A$')
+    ax.set_ylabel(r'$c_2$')
     ax.set_ylim(0.85, 4.6)
     ax.annotate('Sun-Earth, sail', xy=(1.1e-4, 4.30), fontsize=7.2)
     panel_label(ax, '(c)')
@@ -425,21 +425,21 @@ def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
             ln.set_dashes(dash)
     thin_guide(ax, y=A_STAR)
     ax.plot([att['mu_at_A_star']], [A_STAR], 'ko', ms=4.0)
-    ax.annotate(rf"$A=8/5$ at" + "\n" + rf"$\mu={att['mu_at_A_star']:.4f}$",
+    ax.annotate(rf"$c_2=8/5$ at" + "\n" + rf"$\mu={att['mu_at_A_star']:.4f}$",
                 xy=(att['mu_at_A_star'] * 0.30, A_STAR + 2.15), fontsize=6.9,
                 ha='right')
     thin_guide(ax, x=mu)
     ax.annotate('Sun-Earth', xy=(mu * 1.5, 2.15), fontsize=6.8, rotation=90,
                 va='bottom')
     ax.set_xlabel(r'$\mu$')
-    ax.set_ylabel(r'$A$  (classical, $\beta=0$)')
+    ax.set_ylabel(r'$c_2$  (classical, $\beta=0$)')
     ax.set_ylim(0.55, 8.6)
     ax.legend(loc='upper left', fontsize=7.2, ncol=3, columnspacing=0.9,
               handlelength=1.6, borderpad=0.35)
     panel_label(ax, '(d)')
 
     fig.suptitle(r'Frequency ratio at collinear equilibria: a universal bound '
-                 r'and its exact extremum', fontsize=9.5, y=0.999)
+                 r'on $c_2$ and its exact extremum', fontsize=9.5, y=0.999)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     fig.savefig(output, dpi=200)
     plt.close(fig)

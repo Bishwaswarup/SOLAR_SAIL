@@ -251,7 +251,9 @@ def fig_beta_family(sweep=None, output='fig1_beta_family.png', verbose=True):
         'Solar-sail halo orbit family around Sun-Earth L₁  '
         '(Az = 0.003 non-dim ≈ 449 000 km)',
         fontsize=11, y=1.01)
-    plt.tight_layout()
+    # inset axes are not tight_layout-compatible; constrain manually
+    plt.subplots_adjust(left=0.09, right=0.97, top=0.92,
+                        bottom=0.11, wspace=0.26, hspace=0.30)
     fig.savefig(output, dpi=200, bbox_inches='tight')
     plt.close(fig)
     if verbose:

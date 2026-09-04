@@ -240,6 +240,70 @@ def summarise(atlas: dict) -> None:
         print(f"\n  failed: {atlas['failed']}")
 
 
+def load_csv(path: str = 'halo_atlas.csv', mu: float = MU_SE) -> dict:
+    """
+    Reconstruct an atlas dict from halo_atlas.csv.
+
+    Why this exists.  fig_atlas() used to call build() whenever it was not
+    handed an atlas, so plotting the figure silently re-walked every family --
+    tens of minutes, with no output, indistinguishable from a hang.  Plotting
+    should never recompute: build() writes the CSV, and everything the figure
+    needs is in it.  The only field not stored per row was the fold locations,
+    which is why export_csv now writes an `is_fold` flag.
+
+    A CSV written before that column existed loads fine; its families simply
+    carry no fold markers.
+    """
+    import csv as _csv
+    import os
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"{path} not found -- run `python main.py atlas` first "
+            f"(it walks the families and writes the CSV)")
+
+    rows = list(_csv.DictReader(open(path)))
+    if not rows:
+        raise RuntimeError(f"{path} is empty")
+
+    families = {}
+    for r in rows:
+        b = float(r['beta'])
+        f = families.setdefault(b, {k: [] for k in
+                                    ('Az', 'C', 'T', 'x0', 'vy0', 'nu_max',
+                                     'lambda_max', 'delta', 'stable',
+                                     'folds')})
+        f['Az'].append(float(r['Az']))
+        f['C'].append(float(r.get('C_sail', r.get('C', 'nan'))))
+        f['T'].append(float(r['T_nd']))
+        f['x0'].append(float(r['x0']))
+        f['vy0'].append(float(r['vy0']))
+        f['nu_max'].append(float(r['nu_max']))
+        f['lambda_max'].append(float(r['lambda_max']))
+        f['delta'].append(float(r['delta']))
+        f['stable'].append(bool(int(r['stable'])))
+        if int(r.get('is_fold', 0)):
+            f['folds'].append(float(r['Az']))
+        f['gamma'] = float(r['gamma'])
+        f['x_eq'] = float(r['x_eq'])
+        f['seeded_by'] = r.get('seeded_by', '')
+
+    for b, f in families.items():
+        for k in ('Az', 'C', 'T', 'x0', 'vy0', 'nu_max', 'lambda_max',
+                  'delta'):
+            f[k] = np.asarray(f[k], dtype=float)
+        f['stable'] = np.asarray(f['stable'], dtype=bool)
+        f['max_dx_over_gamma'] = float(
+            np.max(np.abs(f['x0'] - f['x_eq'])) / f['gamma'])
+        f['n_far_field'] = 0
+        f['stopped'] = 'loaded from CSV'
+
+    return dict(families=families, failed=[], suspect=[], mu=mu,
+                beta_tidal=critical_beta_tidal(mu),
+                max_dx_over_gamma=MAX_DX_OVER_GAMMA,
+                chain_beta=None, ref_delta_sign=0, source=path)
+
+
 def fig_atlas(output: str = 'fig10_halo_atlas.png',
               atlas: dict = None,
               verbose: bool = True) -> dict:
@@ -256,7 +320,12 @@ def fig_atlas(output: str = 'fig10_halo_atlas.png',
     import matplotlib.pyplot as plt
 
     if atlas is None:
-        atlas = build(verbose=verbose)
+        # Never rebuild implicitly: plotting must be cheap.  Load the cached
+        # CSV, and say plainly what to run if it is absent.
+        atlas = load_csv()
+        if verbose:
+            print(f"  loaded {len(atlas['families'])} families from "
+                  f"{atlas['source']}")
     fams = atlas['families']
     if not fams:
         raise RuntimeError("atlas is empty")
@@ -345,7 +414,8 @@ def export_csv(atlas: dict, path: str = 'halo_atlas.csv') -> str:
         w.writerow(['beta', 'gamma', 'Az', 'Az_over_gamma',
                     'C_sail', 'C_sail_eq', 'dC_from_eq',
                     'T_nd', 'T_days', 'x0', 'x_eq', 'dx_over_gamma', 'vy0',
-                    'nu_max', 'lambda_max', 'delta', 'stable', 'seeded_by'])
+                    'nu_max', 'lambda_max', 'delta', 'stable', 'is_fold',
+                    'seeded_by'])
         for b in sorted(atlas['families']):
             br = atlas['families'][b]
             g = br['gamma']
@@ -364,6 +434,8 @@ def export_csv(atlas: dict, path: str = 'halo_atlas.csv') -> str:
                             f"{br['lambda_max'][i]:.6f}",
                             f"{br['delta'][i]:.8f}",
                             int(br['stable'][i]),
+                            int(any(abs(br['Az'][i] - f) <= 1e-12
+                                    for f in br.get('folds', ()))),
                             br.get('seeded_by', '')])
     return path
 

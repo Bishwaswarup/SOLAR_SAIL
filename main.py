@@ -213,29 +213,53 @@ def stage_figures() -> bool:
     _step('fig4  frequency ratio',
           frequency_ratio.fig_frequency_ratio, verbose=False)
 
-    sweep = None
-    ok, sweep = _step('fig1  halo family vs beta',
-                      paper_extras.fig_beta_family)
-    _step('fig2  eigenvalue map', paper_extras.fig_stability_sweep)
-    _step('fig3  Floquet exponents', paper_extras.fig_floquet)
+    # The beta-sweep (halo corrector + monodromy at each beta) costs ~20 s and
+    # is shared by figures 1-3.  Compute it once and pass it in; calling each
+    # figure with sweep=None recomputes it three times over.
+    ok, sweep = _step('beta-sweep (shared by fig1-3)',
+                      paper_extras._compute_sweep, verbose=False)
+    if not ok:
+        sweep = None
+    _step('fig1  halo family vs beta', paper_extras.fig_beta_family,
+          sweep=sweep, verbose=False)
+    _step('fig2  eigenvalue map', paper_extras.fig_stability_sweep,
+          sweep=sweep, verbose=False)
+    _step('fig3  Floquet exponents', paper_extras.fig_floquet,
+          sweep=sweep, verbose=False)
     _step('fig5  sail control authority',
           sail_authority.fig_control_authority, verbose=False)
     _step('fig5sk sensitivity-matrix corrector',
           paper_extras.fig_stationkeeping_halo)
     _step('fig8  structure dissolution',
           critical_beta.fig_structure_dissolution, verbose=False)
-    _step('fig10 halo atlas', atlas.fig_atlas, verbose=False)
+    # fig10 plots the CACHED atlas.  It must never rebuild here: the family
+    # walk takes tens of minutes and produced no output, which looked exactly
+    # like a hang.  `python main.py atlas` is the stage that computes it.
+    import os
+    if os.path.exists('halo_atlas.csv'):
+        _step('fig10 halo atlas (from cache)', atlas.fig_atlas, verbose=False)
+    else:
+        print("  fig10 halo atlas ... SKIPPED  (no halo_atlas.csv)")
+        print("      run `python main.py atlas` first -- it walks the "
+              "families, which takes minutes, then writes the cache.")
     return not _step.failures
 
 
 def stage_atlas() -> bool:
     """Re-walk the halo families and rewrite halo_atlas.csv.  Slow."""
-    _rule('ATLAS  (slow)')
+    _rule('ATLAS  (slow: tens of minutes)')
     from src import atlas
-    ok, a = _step('walking families by pseudo-arclength', atlas.build)
+    print("  walking 12 halo families by pseudo-arclength.")
+    print("  This is the expensive stage; progress is printed per beta.\n")
+    ok, a = _step('walking families', atlas.build, verbose=True)
     if ok:
         _step('export halo_atlas.csv', atlas.export_csv, a)
         _step('fig10 halo atlas', atlas.fig_atlas, atlas=a, verbose=False)
+        if a.get('suspect'):
+            print(f"\n  BRANCH GUARD flagged: {a['suspect']}")
+        seeds = {b: br.get('seeded_by', '?') for b, br in
+                 sorted(a['families'].items())}
+        print(f"  seeding: {seeds}")
     return ok
 
 

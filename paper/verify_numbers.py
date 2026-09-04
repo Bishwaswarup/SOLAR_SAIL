@@ -87,6 +87,18 @@ chk('standoff at beta=0.5 [km]', ((1 - MU_SE) - x5) * AU_KM, 30865449, tol=60.0)
 chk('standoff at beta=0.5 [r_H]',
     ((1 - MU_SE) - x5) / hill_radius(MU_SE), 20.6, tol=0.05)
 
+# ── Section 3.2: A is Richardson's c2 ───────────────────────────────────────
+def richardson_c2(mu):
+    """c2 = (1/g^3)[mu + (1-mu) g^3/(1-g)^3] with g the distance to m2."""
+    g = (1 - mu) - equilibrium(0.0, mu)
+    return mu / g ** 3 + (1 - mu) / (1 - g) ** 3
+
+
+for name, mu in [('Sun-Earth', MU_SE), ('Earth-Moon', 1.215e-2),
+                 ('Sun-Jupiter', 9.537e-4)]:
+    chk(f'A == Richardson c2 ({name})',
+        abs(A_parameter(0.0, mu) - richardson_c2(mu)), 0.0, tol=1e-13)
+
 # ── Section 5: frequency ratio ──────────────────────────────────────────────
 chk('A_star', A_STAR, 8 / 5, tol=1e-15)
 chk('nu/omega bound', NU_OMEGA_MIN, 0.942809041582, tol=1e-12)
@@ -156,7 +168,9 @@ except Exception as exc:                                      # noqa: BLE001
 tex = open(TEX).read()
 literals = ['0.028646456169', '7:8:9', '0.480187660',
             '35.264', '1.569787', '0.00613', '4.060819', '2.014635',
-            '1.505418', '0.040932']
+            '1.505418', '0.040932',
+            'c_2', 'ceccaroni2016', 'richardson1980', 'gomez2001',
+            'almost equal values of the frequencies']
 missing = [t for t in literals if t.replace('\\\\', '\\') not in tex
            and t not in tex]
 

@@ -58,7 +58,9 @@ from contextlib import redirect_stdout
 
 RESULTS = 'results.txt'
 
-PAPER_FIGURES = ('fig1_beta_family.png',
+PAPER_FIGURES = ('fig1_schematic.png',
+                 'fig4_frequency_ratio.png',
+                 'fig1_beta_family.png',
                  'fig2_stability.png',
                  'fig3_floquet.png',
                  'fig5_control_authority.png',
@@ -104,7 +106,8 @@ def stage_verify() -> bool:
     """Run the regression suite and the closed-form assertions as subprocesses."""
     _rule('VERIFY')
     ok = True
-    for script in ('regression_test.py', 'test_critical_beta.py'):
+    for script in ('regression_test.py', 'test_critical_beta.py',
+                   'paper/verify_numbers.py'):
         if not os.path.exists(script):
             print(f"  {script}: not present, skipped")
             continue
@@ -203,7 +206,12 @@ def stage_results() -> bool:
 def stage_figures() -> bool:
     """Regenerate the paper figures.  Earth-Moon is not included."""
     _rule('FIGURES')
-    from src import atlas, critical_beta, paper_extras, sail_authority
+    from src import (atlas, critical_beta, frequency_ratio, paper_extras,
+                     sail_authority, schematic)
+
+    _step('fig1  setup schematic', schematic.fig_schematic, verbose=False)
+    _step('fig4  frequency ratio',
+          frequency_ratio.fig_frequency_ratio, verbose=False)
 
     sweep = None
     ok, sweep = _step('fig1  halo family vs beta',

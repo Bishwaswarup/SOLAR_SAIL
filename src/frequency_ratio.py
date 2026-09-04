@@ -249,3 +249,200 @@ if __name__ == '__main__':
     print("\n-- across systems " + "-" * 52)
     table_across_systems()
     print()
+
+
+# ── classical collinear points, for the attainability argument ────────────────
+
+def classical_collinear(which: str, mu: float) -> float:
+    """Abscissa of a classical (beta = 0) collinear point."""
+    from scipy.optimize import brentq
+
+    def dU(x):
+        return (x - (1 - mu) * (x + mu) / abs(x + mu)**3
+                - mu * (x - (1 - mu)) / abs(x - (1 - mu))**3)
+
+    e = 1e-12
+    if which == 'L1':
+        return brentq(dU, -mu + e, 1 - mu - e, xtol=1e-15)
+    if which == 'L2':
+        return brentq(dU, 1 - mu + e, 1 - mu + 2.0, xtol=1e-15)
+    if which == 'L3':
+        return brentq(dU, -3.0, -mu - e, xtol=1e-15)
+    raise ValueError(which)
+
+
+def classical_A(which: str, mu: float) -> float:
+    """A at a classical collinear point.  No sail."""
+    x = classical_collinear(which, mu)
+    return ((1 - mu) / abs(x + mu)**3 + mu / abs(x - (1 - mu))**3)
+
+
+def attainability(verbose: bool = True) -> dict:
+    """
+    Which values of A does the CLASSICAL problem reach, and does it reach 8/5?
+
+    Correcting a natural but wrong intuition: A >= 4 holds only at L1.  Across
+    mu in (0, 1/2] the three collinear points cover
+
+        L1  [4.042, 8.000]     L2  [1.570, 3.959]     L3  [1.000, 1.570]
+
+    so the classical problem does reach A < 4, at L2 and L3, and it DOES attain
+    A = 8/5 -- at L2 with mu = 0.4801877, a near-equal-mass binary.  L3 at
+    mu = 1/2 comes within 3.1e-5 of the bound without reaching it.
+
+    The sail's role is therefore tunability, not exclusivity: at FIXED mu it
+    sweeps A continuously through (1, A_classical].  Sun-Earth classically offers
+    only A = 4.0608 (L1), 3.9408 (L2) and 1.0000 (L3); none is at the bound, and
+    a sail at beta = 0.0409 puts that system exactly on it.
+    """
+    from scipy.optimize import brentq
+    mus = np.linspace(1e-6, 0.5, 2000)
+    rng = {}
+    for w in ('L1', 'L2', 'L3'):
+        v = np.array([classical_A(w, m) for m in mus])
+        rng[w] = (float(v.min()), float(v.max()), v)
+    mu_star = brentq(lambda m: classical_A('L2', m) - A_STAR,
+                     0.35, 0.4999999, xtol=1e-15)
+    out = dict(mus=mus, ranges=rng, mu_at_A_star=float(mu_star),
+               A_L3_max=rng['L3'][1],
+               ratio_L3_max=nu_over_omega(rng['L3'][1]))
+    if verbose:
+        for w in ('L1', 'L2', 'L3'):
+            print(f"  A({w}) over mu in (0, 1/2]: "
+                  f"[{rng[w][0]:.6f}, {rng[w][1]:.6f}]")
+        print(f"  classical A = 8/5 attained at L2, mu = {mu_star:.9f}")
+        print(f"  L3 max A = {out['A_L3_max']:.9f}, nu/omega = "
+              f"{out['ratio_L3_max']:.9f}, misses bound by "
+              f"{out['ratio_L3_max'] - NU_OMEGA_MIN:.2e}")
+        for nm, m in (('Sun-Earth', MU_SE),):
+            print(f"  {nm}: A(L1)={classical_A('L1', m):.6f}  "
+                  f"A(L2)={classical_A('L2', m):.6f}  "
+                  f"A(L3)={classical_A('L3', m):.6f}")
+    return out
+
+
+def fig_frequency_ratio(output: str = 'fig4_frequency_ratio.png',
+                        mu: float = MU_SE, verbose: bool = True) -> dict:
+    """
+    The frequency ratio: its universal bound, the exact extremum, the absence of
+    any low-order resonance, and what the sail can reach that the classical
+    problem cannot in a given system.
+    """
+    from src.paperstyle import use, panel_label, thin_guide
+    from src.critical_beta import A_parameter, critical_beta_tidal_exact
+    use()
+    import matplotlib.pyplot as plt
+
+    if verbose:
+        print("  computing attainability ...")
+    att = attainability(verbose=False)
+    A = np.linspace(1.0 + 1e-9, 8.0, 3000)
+    R = np.array([nu_over_omega(a) for a in A])
+    rates = [linear_rates(a) for a in A]
+    nu = np.array([r['nu'] for r in rates])
+    om = np.array([r['omega'] for r in rates])
+    lu = np.array([r['lam_u'] for r in rates])
+
+    betas = np.logspace(-5, np.log10(0.60), 500)
+    A_beta = np.array([A_parameter(b, mu) for b in betas])
+    b_star = beta_at_frequency_extremum(mu)
+    b_tide = critical_beta_tidal_exact(mu)
+
+    fig, axes = plt.subplots(2, 2, figsize=(7.4, 5.9))
+
+    # (a) the ratio, its bound, and the classical reach --------------------
+    ax = axes[0, 0]
+    ax.plot(A, R, 'k-', lw=1.1)
+    thin_guide(ax, y=NU_OMEGA_MIN)
+    thin_guide(ax, x=A_STAR)
+    ax.annotate(r'$2\sqrt{2}/3$', xy=(2.75, NU_OMEGA_MIN + 0.0016),
+                fontsize=7.2)
+    ax.annotate(r'$A=8/5$', xy=(A_STAR + 0.15, 0.9885), fontsize=7.2)
+    # attainable-A bands, drawn in a reserved strip; the y position is a
+    # layout choice and carries no value.
+    ax.annotate('classical reach in $A$:', xy=(1.15, 0.9345), fontsize=6.8,
+                color='0.25')
+    for w, yo in (('L3', 0.0), ('L2', -0.0022), ('L1', -0.0044)):
+        lo, hi = att['ranges'][w][0], att['ranges'][w][1]
+        ax.plot([lo, hi], [0.9325 + yo, 0.9325 + yo], 'k-', lw=2.6,
+                solid_capstyle='butt', alpha=0.55)
+        ax.annotate(w, xy=(lo - 0.10, 0.9325 + yo - 0.0009), fontsize=6.6,
+                    ha='right')
+    ax.set_xlim(0.55, 8.3)
+    ax.set_ylim(0.9255, 1.001)
+    ax.set_xlabel(r'$A$')
+    ax.set_ylabel(r'$\nu/\omega$')
+    panel_label(ax, '(a)')
+
+    # (b) the three rates and the 7:8:9 point -------------------------------
+    ax = axes[0, 1]
+    ax.plot(A, om, 'k-', lw=1.0, label=r'$\omega$')
+    l1, = ax.plot(A, nu, 'k-', lw=1.0, label=r'$\nu=\sqrt{A}$')
+    l1.set_dashes([5, 2])
+    l2, = ax.plot(A, lu, 'k-', lw=1.0, label=r'$\lambda_u$')
+    l2.set_dashes([1, 1.6])
+    thin_guide(ax, x=A_STAR)
+    for val, lab in ((OMEGA_STAR, r'$\sqrt{9/5}$'),
+                     (NU_STAR, r'$\sqrt{8/5}$'),
+                     (LAMBDA_U_STAR, r'$\sqrt{7/5}$')):
+        ax.plot([A_STAR], [val], 'ko', ms=3.0)
+    ax.annotate(r'$\lambda_u^2:\nu^2:\omega^2 = 7:8:9$',
+                xy=(A_STAR + 0.25, 1.05), fontsize=7.0)
+    ax.set_xlim(1, 8.2)
+    ax.set_xlabel(r'$A$')
+    ax.set_ylabel('linear rate  [nd]')
+    ax.legend(loc='upper left', fontsize=7.2)
+    panel_label(ax, '(b)')
+
+    # (c) the sail's tuning curve for Sun-Earth ------------------------------
+    ax = axes[1, 0]
+    ax.semilogx(betas, A_beta, 'k-', lw=1.0)
+    thin_guide(ax, y=A_STAR)
+    thin_guide(ax, x=b_star)
+    ax.annotate(rf'$A=8/5$ at $\beta={b_star:.4f}$',
+                xy=(4e-5, A_STAR + 0.16), fontsize=7.0)
+    thin_guide(ax, x=b_tide)
+    ax.annotate(rf'tidal parity' + '\n' + rf'$\beta={b_tide:.4f}$',
+                xy=(b_tide * 0.75, 2.55), fontsize=6.8, ha='right',
+                va='center')
+    for w, mk, yo in (('L1', 'o', 0.10), ('L2', 's', -0.16), ('L3', '^', 0.0)):
+        ax.plot([1.5e-5], [classical_A(w, mu)], 'k' + mk, ms=3.6,
+                mfc='white', mew=0.8)
+        ax.annotate(w, xy=(2.3e-5, classical_A(w, mu) + yo - 0.05),
+                    fontsize=6.6)
+    ax.set_xlabel(r'$\beta$')
+    ax.set_ylabel(r'$A$')
+    ax.set_ylim(0.85, 4.6)
+    ax.annotate('Sun-Earth, sail', xy=(1.1e-4, 4.30), fontsize=7.2)
+    panel_label(ax, '(c)')
+
+    # (d) classical A vs mu, all three points --------------------------------
+    ax = axes[1, 1]
+    for w, dash in (('L1', None), ('L2', [5, 2]), ('L3', [1, 1.6])):
+        v = att['ranges'][w][2]
+        ln, = ax.semilogx(att['mus'], v, 'k-', lw=1.0, label=w)
+        if dash:
+            ln.set_dashes(dash)
+    thin_guide(ax, y=A_STAR)
+    ax.plot([att['mu_at_A_star']], [A_STAR], 'ko', ms=4.0)
+    ax.annotate(rf"$A=8/5$ at" + "\n" + rf"$\mu={att['mu_at_A_star']:.4f}$",
+                xy=(att['mu_at_A_star'] * 0.30, A_STAR + 2.15), fontsize=6.9,
+                ha='right')
+    thin_guide(ax, x=mu)
+    ax.annotate('Sun-Earth', xy=(mu * 1.5, 2.15), fontsize=6.8, rotation=90,
+                va='bottom')
+    ax.set_xlabel(r'$\mu$')
+    ax.set_ylabel(r'$A$  (classical, $\beta=0$)')
+    ax.set_ylim(0.55, 8.6)
+    ax.legend(loc='upper left', fontsize=7.2, ncol=3, columnspacing=0.9,
+              handlelength=1.6, borderpad=0.35)
+    panel_label(ax, '(d)')
+
+    fig.suptitle(r'Frequency ratio at collinear equilibria: a universal bound '
+                 r'and its exact extremum', fontsize=9.5, y=0.999)
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    fig.savefig(output, dpi=200)
+    plt.close(fig)
+    if verbose:
+        print(f"  Saved -> {output}")
+    return dict(attainability=att, beta_star=b_star, beta_tidal=b_tide)

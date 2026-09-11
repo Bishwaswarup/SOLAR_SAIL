@@ -164,6 +164,47 @@ except Exception as exc:                                      # noqa: BLE001
     checks.append(('sail_technology import', float('nan'), float('nan'), False))
     failures.append(f'sail_technology: {exc}')
 
+# ── Section 6: the atlas CSV must match what the manuscript claims ──────────
+# These were NOT checked before, and that is how the atlas silently lost its
+# three lowest beta (an over-strict branch guard) while the manuscript went on
+# claiming twelve families over [0.001, 0.05].  Scalars alone are not enough.
+import csv as _csv
+import os as _os
+
+if _os.path.exists('halo_atlas.csv'):
+    _rows = list(_csv.DictReader(open('halo_atlas.csv')))
+    _b = sorted({float(r['beta']) for r in _rows})
+    chk('atlas: number of beta values', len(_b), 12, tol=0)
+    chk('atlas: lowest beta', min(_b), 0.001, tol=1e-9)
+    chk('atlas: highest beta', max(_b), 0.050, tol=1e-9)
+
+    _d = [float(r['delta']) for r in _rows]
+    chk('atlas: all delta same sign as reference',
+        float(min(_d) * max(_d) > 0), 1.0, tol=0)
+
+    _past = sum(float(r['x0']) >= 1.0 - MU_SE for r in _rows)
+    chk('atlas: members past the smaller primary', _past, 0, tol=0)
+
+    _bad_med = 0
+    for _bb in _b:
+        _g = [r for r in _rows if float(r['beta']) == _bb]
+        _med = float(np.median([float(r['x0']) for r in _g]))
+        if _med >= float(_g[0]['x_eq']):
+            _bad_med += 1
+    chk('atlas: families not sunward (median x0)', _bad_med, 0, tol=0)
+
+    if 'seeded_by' in _rows[0]:
+        _seeds = {}
+        for r in _rows:
+            _seeds.setdefault(float(r['beta']), r['seeded_by'])
+        _boot = [b for b, v in _seeds.items() if v != 'chained']
+        # only the first beta should bootstrap; more means the chain is failing
+        chk('atlas: beta values not chained (expect 1, the seed)',
+            len(_boot), 1, tol=0)
+else:
+    checks.append(('atlas: halo_atlas.csv present', 0.0, 1.0, False))
+    failures.append('halo_atlas.csv missing -- run `python main.py atlas`')
+
 # ── cross-check: do these literals actually appear in main.tex? ─────────────
 tex = open(TEX).read()
 literals = ['0.028646456169', '7:8:9', '0.480187660',

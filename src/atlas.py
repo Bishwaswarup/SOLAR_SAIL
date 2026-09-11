@@ -125,12 +125,28 @@ def build(betas=None, mu: float = MU_SE,
         return (s0, Th0), float(Az0)
 
     def _branch_ok(br, eq):
-        """(ok, reason).  Checks branch identity against the reference."""
+        """
+        (ok, reason).  Two independent tests, neither of them all-or-nothing
+        on a single member.
+
+        An earlier version rejected the whole branch if ANY member had
+        x0 >= x_eq.  That is wrong: a large-amplitude halo legitimately carries
+        its z-extremum crossing to the Earthward side of the equilibrium, so at
+        70 continuation steps the test fired on healthy families and discarded
+        them entirely -- it cost the three lowest beta of the atlas.  The
+        diagnosis that motivated the guard (beta = 0.040 landing on another
+        branch) rested on three signals together: delta negative where every
+        neighbour was positive, the family sitting predominantly Earthward, and
+        x0 running past the smaller primary.  We test the robust two.
+        """
         med = float(np.median(br['delta']))
         if ref_delta_sign and np.sign(med) != ref_delta_sign:
-            return False, f'delta sign {np.sign(med):+.0f} vs ref {ref_delta_sign:+.0f}'
-        if np.any(br['x0'] >= eq[0]):
-            return False, 'x0 reaches or exceeds x_eq (not sunward)'
+            return False, (f'delta sign {np.sign(med):+.0f} vs '
+                           f'ref {ref_delta_sign:+.0f}')
+        if np.any(br['x0'] >= 1.0 - mu):
+            return False, 'x0 reaches or passes the smaller primary'
+        if float(np.median(br['x0'])) >= eq[0]:
+            return False, 'median x0 is not sunward of x_eq'
         return True, ''
 
     for b in np.asarray(betas, dtype=float):
@@ -143,9 +159,17 @@ def build(betas=None, mu: float = MU_SE,
         # -- choose a seed: chained from the previous beta, else bootstrap ----
         seed, Az0, how = None, float('nan'), ''
         if chain_beta and prev is not None:
-            s_prev, Th_prev, g_prev = prev
+            s_prev, Th_prev, g_prev, xeq_prev = prev
+            # Translate to the new equilibrium AND rescale by the local length.
+            # Rescaling z0 alone (the first version) left x0 sitting at the old
+            # equilibrium, an offset of order 1% of gamma -- small, but enough
+            # to break the corrector at the smallest amplitudes, which is why
+            # the chained seed was rejected at nearly every beta.
+            sc = gamma / g_prev
             s_try = np.array(s_prev, dtype=float).copy()
-            s_try[2] *= gamma / g_prev          # preserve Az/gamma
+            s_try[0] = eq[0] + (s_try[0] - xeq_prev) * sc
+            s_try[2] *= sc
+            s_try[4] *= sc
             seed, Az0, how = (s_try, Th_prev), float(abs(s_try[2])), 'chained'
         if seed is None:
             try:
@@ -192,7 +216,7 @@ def build(betas=None, mu: float = MU_SE,
         if not ref_delta_sign:
             ref_delta_sign = int(np.sign(np.median(br['delta'])))
         br['seeded_by'] = how
-        prev = (br['state0'][0], br['T'][0] / 2.0, gamma)
+        prev = (br['state0'][0], br['T'][0] / 2.0, gamma, eq[0])
 
         br['Az_seed'] = float(Az0)
         families[float(b)] = br

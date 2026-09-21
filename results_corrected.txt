@@ -1,7 +1,24 @@
-Solar Sail CR3BP — Corrected Numerical Results
-===============================================
-Supersedes results.txt.  Every number below was re-derived independently in
-verify_critique.py / verify_transfer.py and cross-checked against the project code.
+Solar Sail CR3BP — Critique of the transfer / heteroclinic claims
+=================================================================
+STATUS AND SCOPE.  This file is a hand-written AUDIT, not generated output,
+and it does NOT supersede results.txt.
+
+  * results.txt is the machine-generated headline file.  It is rewritten by
+    `python main.py results` and is the authority for every number quoted in
+    the manuscript.  It is also NEWER than this file.
+  * This file records why the Earth-Moon transfer and "heteroclinic
+    connection" results were withdrawn from the paper: the Sun-Earth
+    "transfer" was self-matching, and the 544 m/s Earth-Moon connection is a
+    manifold-guided two-impulse transfer, not a heteroclinic connection.
+    That reasoning is kept because it is the justification for excluding
+    fig6_poincare_map.png and fig7_manifold_transfer.png from the manuscript.
+
+An earlier header claimed these numbers were "re-derived independently in
+verify_critique.py / verify_transfer.py".  NEITHER SCRIPT EXISTS in this
+repository, so that claim could not be checked by anyone cloning it and has
+been removed.  Treat the figures below as a recorded argument, not as
+reproducible output: the reproducible set is results.txt plus the three
+suites run by `python main.py verify`.
 
 ─── HEADLINE RESULT: dissolution of the collinear structure ─────────────────
 For a face-on sail the radiation force is radial and conservative, so it

@@ -338,3 +338,32 @@ doi.org URIs     : 14
 | `arxiv_audit_report.md` | this report |
 | `paper/main.tex` | edited in place on your machine |
 | `paper/backup_20260917-150302/` | the untouched originals |
+
+---
+
+## Addendum — 22 September 2026: correction to §3.2 of this report
+
+**This report's §3.2 resolved the Sun–Jupiter row of `tab:closed` the wrong way, and the edit has since been reverted.**
+
+On 17 September the row was internally inconsistent: β_crit matched μ = 9.537e-4 while r₂ = 0.098438 matched μ = 9.5388e-4. I assumed the μ column was authoritative and changed r₂ to 0.098432. That was the wrong direction.
+
+Evidence found on 21 September: `test_critical_beta.py` line 57 uses **9.5388e-4**, disagreeing with `main.tex`, `paper/verify_numbers.py` and `src/frequency_ratio.py`, which all used 9.537e-4. Recomputation from IAU constants shows these are two different *conventions*, not a typo:
+
+| convention | m/M | μ | rounds to |
+|---|---|---|---|
+| Jupiter, planet only (IAU 2015 nominal GM) | 9.545942e-4 | 9.53683853e-4 | **9.5368e-4** ≈ 9.537e-4 |
+| Jupiter **system** (planet + Galilean moons; IAU mass ratio 1047.348644) | 9.547919e-4 | 9.53881151e-4 | **9.5388e-4** |
+
+The CR3BP requires the **system** value: the Galilean moons orbit Jupiter, so it is the Jupiter-system barycentre that orbits the Sun. `test_critical_beta.py` had it right; everything else did not.
+
+**Resolution applied 22 September:** μ = 9.5388e-4 everywhere (`main.tex`, `paper/verify_numbers.py` ×2, `src/frequency_ratio.py`). The Sun–Jupiter row is now
+
+```
+Sun--Jupiter & 9.5388e-4 & 0.187186695655 & 0.187186695655 & 2.8e-16 & 0.098438
+```
+
+so β_crit changes from 0.187175530204 to **0.187186695655**, and **r₂ returns to the original 0.098438**. The r₂ edit recorded in §3.2 and §4 (E5) of this report is void.
+
+The other three r₂ corrections in §3.2 (Sun–Mercury 0.005500 → 0.005496, Earth–Moon 0.229900 → 0.229893) stand: those were genuine rounding slips, not convention differences.
+
+`paper/verify_numbers.py` now parses `tab:closed` out of `main.tex` and ties r₂ to the μ printed beside it, so this class of inconsistency cannot recur silently whichever convention is chosen.

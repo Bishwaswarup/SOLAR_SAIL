@@ -54,7 +54,7 @@ Where that sits against real hardware is a checkable question, and the answer is
 | LightSail-2 (2019) | 0.0061 | 32 m², 5 kg — best flown |
 | Solar Cruiser | 0.0202 | design only, cancelled 2022 |
 
-So tidal parity is **≈ 3× beyond the best flown sail** and **within 40 % of the most ambitious funded design**. The defensible claim is that it lies at the edge of *near-term* capability — which is stronger than the unsourced version precisely because it can be checked.
+So tidal parity is **a factor of 4.7 beyond the best sail flown and deployed** — 2.9 if that sail is credited with a perfect reflector — and **a factor of 1.4 beyond the most ambitious funded design** (β_crit is 41.6 % above Solar Cruiser, not "within 40 %" of it). The defensible claim is that it lies at the edge of *near-term* capability — which is stronger than the unsourced version precisely because it can be checked. Every factor here is printed by `compare_to_threshold()` in [`src/sail_technology.py`](src/sail_technology.py) and appears in [`results.txt`](results.txt); none is written out by hand.
 
 <div align="center"><img src="fig8_structure_dissolution.png" width="95%"/></div>
 

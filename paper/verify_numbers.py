@@ -60,7 +60,7 @@ chk('Hill-exit beta', critical_beta_hill(MU_SE), 2.9814e-4, tol=1e-8)
 
 for name, mu, claimed in [('Sun-Mercury', 1.66e-7, 0.010961524792),
                           ('Sun-Earth', MU_SE, 0.028646456169),
-                          ('Sun-Jupiter', 9.537e-4, 0.187175530204),
+                          ('Sun-Jupiter', 9.5388e-4, 0.187186695655),
                           ('Earth-Moon', 1.215e-2, 0.406934946280)]:
     chk(f'beta_crit {name}', critical_beta_tidal_exact(mu), claimed, tol=1e-11)
 
@@ -95,7 +95,7 @@ def richardson_c2(mu):
 
 
 for name, mu in [('Sun-Earth', MU_SE), ('Earth-Moon', 1.215e-2),
-                 ('Sun-Jupiter', 9.537e-4)]:
+                 ('Sun-Jupiter', 9.5388e-4)]:
     chk(f'A == Richardson c2 ({name})',
         abs(A_parameter(0.0, mu) - richardson_c2(mu)), 0.0, tol=1e-13)
 

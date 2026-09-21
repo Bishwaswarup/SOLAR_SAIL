@@ -214,8 +214,15 @@ def summary(mu: float = MU_SE, verbose: bool = True) -> dict:
 
 def table_across_systems(verbose: bool = True) -> list:
     """A_star and the rate ratios are mu-independent; the betas are not."""
+    # Sun-Jupiter uses the Jupiter SYSTEM mass ratio (planet + Galilean
+    # moons), mu = 9.5388e-4, from the IAU Sun/Jupiter-system mass ratio
+    # 1047.348644.  The planet-only value is 9.5368e-4; an earlier version of
+    # this list rounded that to 9.537e-4 while test_critical_beta.py used the
+    # system value, so the repo quoted two different Sun-Jupiter mass ratios.
+    # The system value is the right one for the CR3BP: the Galilean moons orbit
+    # Jupiter, so it is the Jupiter-system barycentre that orbits the Sun.
     systems = [('Sun-Mercury', 1.66e-7), ('Sun-Earth', MU_SE),
-               ('Sun-Jupiter', 9.537e-4), ('Earth-Moon', 1.215e-2)]
+               ('Sun-Jupiter', 9.5388e-4), ('Earth-Moon', 1.215e-2)]
     from src.critical_beta import critical_beta_tidal_exact
     rows = []
     if verbose:

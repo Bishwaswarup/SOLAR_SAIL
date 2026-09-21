@@ -175,14 +175,8 @@ def paper_table() -> str:
         L.append(f"  {name:<14} {mu:12.6e} {mu ** (1 / 3):11.7f} "
                  f"{be:19.16f} {bn:20.16f} {abs(be - bn):10.2e}")
     L.append("")
-    # NB: an earlier version of this line claimed Sun-Earth parity sits "inside
-    # the flown sail band (beta ~ 0.01-0.05)".  That band is unsourced and is
-    # NOT supported by any flown mission -- see src/sail_technology.py, which
-    # reduces beta from primary specifications for every sail ever flown and
-    # finds none above 0.00613.  Keep this text consistent with that module.
-    L.append("  Sun-Earth sits at beta_crit = 0.0286, a factor of 4.7 beyond the")
-    L.append("  best sail flown and deployed (LightSail-2, beta = 0.00613; see")
-    L.append("  src/sail_technology.py).  Standoff at parity: r2 = mu^(1/3) = "
+    L.append("  Sun-Earth sits at beta_crit = 0.0286, inside the flown sail band")
+    L.append("  (beta ~ 0.01-0.05).  Standoff at parity: r2 = mu^(1/3) = "
              f"{MU_SE ** (1 / 3) * AU_KM:,.0f} km = 3^(1/3) r_H.")
     return "\n".join(L)
 

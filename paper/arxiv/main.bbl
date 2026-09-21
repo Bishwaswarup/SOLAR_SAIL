@@ -1,0 +1,121 @@
+\begin{thebibliography}{15}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ceccaroni et~al.(2016)Ceccaroni, Celletti, and Pucacco]{ceccaroni2016}
+Marta Ceccaroni, Alessandra Celletti, and Giuseppe Pucacco.
+\newblock Bifurcations thresholds of halo orbits.
+\newblock In \emph{Astrodynamics Network AstroNet-II}, volume~44 of
+  \emph{Astrophysics and Space Science Proceedings}, pages 35--44. Springer,
+  2016.
+\newblock \doi{10.1007/978-3-319-23986-6_3}.
+
+\bibitem[McInnes et~al.(1994)McInnes, McDonald, Simmons, and
+  MacDonald]{mcinnes1994}
+Colin~R. McInnes, Alastair~J. McDonald, John F.~L. Simmons, and Euan~W.
+  MacDonald.
+\newblock Solar sail parking in restricted three-body systems.
+\newblock \emph{Journal of Guidance, Control, and Dynamics}, 17\penalty0
+  (2):\penalty0 399--406, 1994.
+\newblock \doi{10.2514/3.21211}.
+
+\bibitem[Baoyin and McInnes(2006)]{baoyin2006}
+Hexi Baoyin and Colin~R. McInnes.
+\newblock Solar sail halo orbits at the {S}un--{E}arth artificial {$L_1$}
+  point.
+\newblock \emph{Celestial Mechanics and Dynamical Astronomy}, 94\penalty0
+  (2):\penalty0 155--171, 2006.
+\newblock \doi{10.1007/s10569-005-4626-3}.
+
+\bibitem[Waters and McInnes(2007)]{waters2007}
+Thomas~J. Waters and Colin~R. McInnes.
+\newblock Periodic orbits above the ecliptic in the solar-sail restricted
+  three-body problem.
+\newblock \emph{Journal of Guidance, Control, and Dynamics}, 30\penalty0
+  (3):\penalty0 687--693, 2007.
+\newblock \doi{10.2514/1.26232}.
+
+\bibitem[Farr{\'e}s and Jorba(2010)]{farres2010}
+Ariadna Farr{\'e}s and {\`A}ngel Jorba.
+\newblock Periodic and quasi-periodic motions of a solar sail close to {$SL_1$}
+  in the {E}arth--{S}un system.
+\newblock \emph{Celestial Mechanics and Dynamical Astronomy}, 107\penalty0
+  (1--2):\penalty0 233--253, 2010.
+\newblock \doi{10.1007/s10569-010-9268-4}.
+
+\bibitem[Farr{\'e}s and Jorba(2016)]{farres2016}
+Ariadna Farr{\'e}s and {\`A}ngel Jorba.
+\newblock Station keeping strategies for a solar sail in the solar system.
+\newblock In \emph{Advances in Astrodynamics and Space Applications}. Springer,
+  2016.
+\newblock \doi{10.1007/978-3-319-27464-5_3}.
+
+\bibitem[McInnes(1999)]{mcinnes1999}
+Colin~R. McInnes.
+\newblock \emph{Solar Sailing: Technology, Dynamics and Mission Applications}.
+\newblock Springer--Praxis, Chichester, UK, 1999.
+\newblock \doi{10.1007/978-1-4471-3992-8}.
+
+\bibitem[Richardson(1980)]{richardson1980}
+David~L. Richardson.
+\newblock Analytic construction of periodic orbits about the collinear points.
+\newblock \emph{Celestial Mechanics}, 22\penalty0 (3):\penalty0 241--253, 1980.
+\newblock \doi{10.1007/BF01229511}.
+
+\bibitem[G{\'o}mez et~al.(2001)G{\'o}mez, Masdemont, and Mondelo]{gomez2001}
+Gerard G{\'o}mez, Josep~J. Masdemont, and Josep~M. Mondelo.
+\newblock The dynamics around the collinear equilibrium points of the {RTBP}.
+\newblock \emph{Physica D}, 157\penalty0 (4):\penalty0 283--321, 2001.
+\newblock \doi{10.1016/S0167-2789(01)00312-8}.
+
+\bibitem[Mori et~al.(2010)Mori, Sawada, Funase, et~al.]{mori2010}
+Osamu Mori, Hirotaka Sawada, Ryu Funase, et~al.
+\newblock First solar power sail demonstration by {IKAROS}.
+\newblock \emph{Transactions of the Japan Society for Aeronautical and Space
+  Sciences}, 8\penalty0 (ists27):\penalty0 To\_4\_25--To\_4\_31, 2010.
+\newblock \doi{10.2322/tastj.8.To_4_25}.
+
+\bibitem[Tsuda et~al.(2011)Tsuda, Mori, Funase, Sawada, Yamamoto, Saiki, Endo,
+  and Kawaguchi]{tsuda2011}
+Yuichi Tsuda, Osamu Mori, Ryu Funase, Hirotaka Sawada, Takayuki Yamamoto,
+  Takanao Saiki, Tatsuya Endo, and Jun'ichiro Kawaguchi.
+\newblock Flight status of {IKAROS} deep space solar sail demonstrator.
+\newblock \emph{Acta Astronautica}, 69\penalty0 (9--10):\penalty0 833--840,
+  2011.
+\newblock \doi{10.1016/j.actaastro.2011.06.005}.
+
+\bibitem[Spencer et~al.(2021)Spencer, Betts, Bellardo, Diaz, Plante, and
+  Mansell]{spencer2021}
+David~A. Spencer, Bruce Betts, John~M. Bellardo, Alex Diaz, Barbara Plante, and
+  Justin~R. Mansell.
+\newblock The {LightSail} 2 solar sailing technology demonstration.
+\newblock \emph{Advances in Space Research}, 67\penalty0 (9):\penalty0
+  2878--2889, 2021.
+\newblock \doi{10.1016/j.asr.2020.06.029}.
+
+\bibitem[McNutt et~al.(2014)McNutt, Johnson, Clardy, Castillo-Rogez, Frick, and
+  Jones]{mcnutt2014}
+Leslie McNutt, Les Johnson, Dennon Clardy, Julie Castillo-Rogez, Andreas Frick,
+  and Laura Jones.
+\newblock Near-{E}arth asteroid scout.
+\newblock \emph{AIAA SPACE Conference Proceedings}, 2014.
+\newblock \doi{10.2514/6.2014-4435}.
+
+\bibitem[Wilkie(2021)]{acs3}
+W.~Keats Wilkie.
+\newblock The {NASA} advanced composite solar sail system ({ACS3}) flight
+  demonstration.
+\newblock Technical Report NTRS 20210016824, NASA, 2021.
+
+\bibitem[Dachwald et~al.(2013)Dachwald, Macdonald, McInnes, Mengali, and
+  Quarta]{dachwald2013}
+Bernd Dachwald, Malcolm Macdonald, Colin~R. McInnes, Giovanni Mengali, and
+  Alessandro~A. Quarta.
+\newblock Solar sails are not ideal, and yes it matters.
+\newblock In \emph{Advances in Solar Sailing}. Springer, 2013.
+\newblock \doi{10.1007/978-3-642-34907-2_55}.
+
+\end{thebibliography}

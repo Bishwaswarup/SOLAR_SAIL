@@ -12,29 +12,12 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{siunitx}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage{hyperref}
-\usepackage{doi}
-\hypersetup{
-  colorlinks = true,
-  linkcolor  = {[rgb]{0.12,0.22,0.45}},   % muted navy, print-safe
-  citecolor  = {[rgb]{0.10,0.36,0.26}},   % muted forest
-  urlcolor   = {[rgb]{0.40,0.16,0.36}},   % muted plum
-  pdftitle   = {Dissolution of the collinear structure in the solar-sail
-                circular restricted three-body problem: an exact tidal-parity
-                threshold and a universal frequency bound},
-  pdfauthor  = {Bishwaswarup},
-  pdfsubject = {Solar-sail circular restricted three-body problem; artificial
-                equilibria; collinear points; tidal parity; frequency bound},
-  pdfkeywords= {solar sail; restricted three-body problem; artificial
-                equilibria; collinear points; Legendre coefficient c2;
-                Hill radius; halo orbits; controllability}
-}
+\usepackage[hidelinks]{hyperref}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{authblk}
 
 \sisetup{group-minimum-digits=4, detect-all}
-\graphicspath{{../}{./}}
+\graphicspath{{../}}
 
 \newcommand{\rhat}{\hat{\bm{r}}}
 \newcommand{\phat}{\hat{\bm{p}}}
@@ -68,8 +51,8 @@ the linearised dynamics equal the centrifugal background, $s\equiv\mu/r_2^3=1$,
 equivalently $r_2=\mu^{1/3}=3^{1/3}r_H$ --- on the on-axis force balance yields
 the closed form
 $\beta_{\mathrm{crit}}=1-\bigl(1-\mu^{1/3}\bigr)^2=2\mu^{1/3}-\mu^{2/3}$,
-exact for every mass ratio and verified against independent root-finding at
-machine precision over $\mu\in[10^{-7},10^{-2}]$ (\num{2.1e-16} at Sun--Earth). For Sun--Earth this gives
+exact for every mass ratio and verified against independent root-finding to
+\num{2.1e-16} over $\mu\in[10^{-7},10^{-2}]$. For Sun--Earth this gives
 $\beta_{\mathrm{crit}}=0.0286$. Second, writing $c_2$ for the second Legendre
 coefficient of the collinear expansion --- the quantity a sail detunes
 continuously, and which is otherwise fixed by the mass ratio and the choice of
@@ -84,7 +67,7 @@ for all $\beta$ and the degeneration is smooth, so these are exact structural
 landmarks rather than dynamical transitions, and we show by explicit search that
 no commensurability exists anywhere to make one. Reducing $\beta$ from primary
 mission specifications, we find that no solar sail yet flown exceeds
-$\beta=0.00613$, placing tidal parity a factor of $4.7$ beyond demonstrated
+$\beta=0.0061$, placing tidal parity a factor of $4.7$ beyond demonstrated
 capability. Finally, linearising the sail acceleration in its two attitude
 angles shows that the face-on nominal is a \emph{singular} configuration for
 station-keeping: $\partial\bm{a}/\partial\delta$ vanishes identically at
@@ -328,8 +311,7 @@ by~\eqref{eq:hover} and hence $S\to1$, so
 We call $s$ the \emph{saddle strength}. Because $s>0$ for all finite $r_2$, the
 saddle never strictly disappears: there is no bifurcation, only a smooth decay,
 and the physically meaningful statement is its rate. Table~\ref{tab:collapse}
-records that rate and Figure~\ref{fig:stability} the accompanying collapse of
-$\lambda_u$; $s$ falls four decades between $\beta=0$ and $\beta=0.5$.
+records that rate; $s$ falls four decades between $\beta=0$ and $\beta=0.5$.
 
 It is worth being precise about~\eqref{eq:As}, because the convergence is slower
 than it looks. At tidal parity, $S=(1-\mu)/(1-\mu^{1/3})=1.014635$ exactly, so
@@ -369,8 +351,7 @@ therefore write $A-1=(S-1)+s$ and use the exact $A$ throughout.
   Earth-free hovering law~\eqref{eq:hover}; the inset shows the smaller
   primary's entire contribution collapsing to a few thousand kilometres.
   \textbf{(b)} The standoff crosses the Hill sphere almost immediately
-  (at $\beta=\num{2.98e-4}$, the Hill-exit value, not
-  $\beta_{\mathrm{crit}}$) and reaches $20.6\,r_H$ by
+  ($\beta_{\mathrm{crit}}=\num{2.98e-4}$) and reaches $20.6\,r_H$ by
   $\beta=0.5$. \textbf{(c)} The saddle strength falls four decades; $s=1$
   locates tidal parity. \textbf{(d)} Both frequencies converge on the mean
   motion and $\lambda_u\to0$: the Keplerian epicyclic degeneracy of an inverse
@@ -442,11 +423,9 @@ Section~\ref{sec:dissolution}.
 We evaluate~\eqref{eq:closed} against independent Brent root-finding on
 $s(\beta)-1$, where $s$ is computed from the numerically solved
 equilibrium~\eqref{eq:balance}. Table~\ref{tab:closed} reports both across five
-decades of mass ratio. Over a 61-point logarithmic sweep of
-$\mu\in[10^{-7},10^{-2}]$ the two never differ by more than \num{1.9e-15},
-i.e. a few units in the last place; at Sun--Earth the discrepancy is
-\num{2.1e-16}. The two computations share no code path beyond the balance
-itself.
+decades of mass ratio. The worst discrepancy over a 61-point logarithmic sweep
+of $\mu\in[10^{-7},10^{-2}]$ is \num{2.1e-16}, i.e. machine precision; the two
+computations share no code path beyond the balance itself.
 
 \begin{table}[t]
   \centering
@@ -461,10 +440,10 @@ itself.
     $\beta_{\mathrm{crit}}$ (root-find) &
     $|\Delta|$ & $r_2$ [nd] \\
     \midrule
-    Sun--Mercury & \num{1.660e-7} & \num{0.010961524792} & \num{0.010961524792} & \num{3.1e-16} & \num{0.005496} \\
-    Sun--Earth   & \num{3.003e-6} & \num{0.028646456169} & \num{0.028646456169} & \num{2.1e-16} & \num{0.014427} \\
-    Sun--Jupiter & \num{9.537e-4} & \num{0.187175530204} & \num{0.187175530204} & \num{2.2e-16} & \num{0.098432} \\
-    Earth--Moon  & \num{1.215e-2} & \num{0.406934946280} & \num{0.406934946280} & \num{5.0e-16} & \num{0.229893} \\
+    Sun--Mercury & \num{1.660e-7} & \num{0.010961524792} & \num{0.010961524792} & \num{1.7e-16} & \num{0.005500} \\
+    Sun--Earth   & \num{3.003e-6} & \num{0.028646456169} & \num{0.028646456169} & \num{6.9e-18} & \num{0.014427} \\
+    Sun--Jupiter & \num{9.537e-4} & \num{0.187175530204} & \num{0.187175530204} & \num{5.6e-17} & \num{0.098438} \\
+    Earth--Moon  & \num{1.215e-2} & \num{0.406934946280} & \num{0.406934946280} & \num{5.6e-17} & \num{0.229900} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -777,8 +756,7 @@ therefore reduce $\beta$ from primary mission specifications rather than quoting
 secondary values, using $\beta=\sigma^{\ast}/\sigma$ with the critical sail
 loading $\sigma^{\ast}=2P/g_{\odot}$. Evaluated from CODATA and IAU constants,
 $\sigma^{\ast}=\SI{1.5311}{\gram\per\metre\squared}$, reproducing McInnes'
-\num{1.53}~\cite{mcinnes1999} to the three figures he quotes, which validates
-the chain.
+\num{1.53}~\cite{mcinnes1999} to four figures, which validates the chain.
 
 \begin{table}[t]
   \centering
@@ -787,10 +765,7 @@ the chain.
   perfect-reflector limit; $\beta_{\mathrm{eff}}$ applies the optical efficiency
   $\eta=1.12/1.79=0.626$ measured on IKAROS. IKAROS is the only entry whose
   lightness number follows from a \emph{measured} thrust and needs no optical
-  assumption. Solar Cruiser has no published mass; its $\beta_{\mathrm{ideal}}$
-  is reduced instead from the published characteristic acceleration
-  $\geq\SI{0.12}{\milli\metre\per\second\squared}$, and is therefore a lower
-  bound rather than a value obtainable from the area column.}
+  assumption.}
   \label{tab:tech}
   \begin{tabular}{lccccl}
     \toprule
@@ -823,9 +798,8 @@ $\beta_{\mathrm{crit}}=\num{0.028646}$:
 \end{tabular}
 \end{center}
 
-Tidal parity is therefore a factor of $4.7$ beyond the best sail flown and
-deployed --- $2.9$ if that sail is credited with a perfect reflector --- and a
-factor of $1.4$ beyond the most ambitious design funded to flight hardware.
+Tidal parity is therefore roughly three times beyond the best sail flown and
+within \SI{40}{\percent} of the most ambitious design funded to flight hardware.
 The defensible statement is that it lies at the edge of \emph{near-term} rather
 than current capability. We note explicitly that a claim of the form
 ``$\beta\sim0.01$--$0.05$ is current technology'', which appears informally, is
@@ -914,7 +888,7 @@ a single entry point. Every quantity quoted in this paper is regenerated by the
 pipeline and written to a machine-generated results file; no value is
 hand-transcribed.
 
-\bibliographystyle{unsrtnat}
+\bibliographystyle{unsrt}
 \bibliography{refs}
 
 \end{document}

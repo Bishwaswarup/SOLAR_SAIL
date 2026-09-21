@@ -1,3 +1,29 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# IDE / editor state -- was tracked by mistake; untrack once with
+#   git rm -r --cached .idea
+.idea/
+
+# Local virtualenv.  Note .venv/ here is a macOS venv: its interpreter is a
+# Mach-O binary and will not run on Linux or Windows.  Recreate from
+# requirements.txt rather than committing it.
+.venv/
+venv/
+env/
+
+# LaTeX build artefacts.  The .bbl is DELIBERATELY not ignored -- arXiv needs
+# it shipped in the submission package, since it runs no bibtex.
+*.aux
+*.log
+*.out
+*.blg
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# macOS bundle noise
+__MACOSX/
+._*

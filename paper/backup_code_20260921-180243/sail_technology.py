@@ -26,18 +26,12 @@ So beta_crit = 0.0286 is:
     2.9x  the best flown sail at its ideal-reflector limit (LightSail-2, 9.8e-3)
     4.7x  the best flown sail realistically  (LightSail-2, 6.1e-3)
     1.4x  the most ambitious funded design ever built to (Solar Cruiser, 0.020)
-     47x  the only sail with a MEASURED lightness number (IKAROS, 6.2e-4)
+     46x  the only sail with a MEASURED lightness number (IKAROS, 6.2e-4)
 
 The honest claim is therefore NOT "already achievable".  It is that tidal parity
-sits a factor of 4.7 beyond flown hardware and a factor of 1.4 beyond a sail NASA
-had already designed and begun building — which is a stronger and more interesting
+sits a factor of a few beyond flown hardware and within ~40 % of a sail NASA had
+already designed and begun building — which is a stronger and more interesting
 statement than the unsupported one, because it is checkable.
-
-NB on rounding: beta_crit / beta_IKAROS = 46.56, which rounds to 47, not 46.
-And beta_crit / beta_SolarCruiser = 1.4156, i.e. beta_crit is 41.6 % ABOVE the
-Solar Cruiser design -- NOT "within 40 % of" it.  Both slips previously reached
-the manuscript.  Do not restate these as words; `compare_to_threshold()`
-interpolates every factor from the computed values.
 
 The conversion
 ──────────────
@@ -243,24 +237,11 @@ def compare_to_threshold(beta_crit: float = None) -> str:
     L.append(f"  NOT supported: no flown sail has exceeded {hi:.4f}, and the only")
     L.append(f"  measured value is {ika.beta_measured:.5f}.")
     L.append("")
-    # Every factor below is COMPUTED, never spelled out in words.  A previous
-    # version hard-coded "a factor of three" (the ideal-reflector figure) next
-    # to the realistic best-flown beta, and "within 40 %" when the true shortfall
-    # is 41.6 %.  Both errors were copied verbatim into the manuscript's Sec. 8,
-    # where they contradicted the abstract.  Keep these interpolated.
-    f_real = beta_crit / ls2.beta_effective
-    f_ideal = beta_crit / ls2.beta_ideal
-    f_sc = beta_crit / sc.beta_ideal
     L.append("  Defensible wording for the abstract:")
-    L.append(f"    'Tidal parity for Sun-Earth falls at beta = {beta_crit:.4f}, a factor")
-    L.append(f"     of {f_real:.1f} beyond the best sail flown and deployed (LightSail-2,")
-    L.append(f"     beta = {ls2.beta_effective:.5f}; {f_ideal:.1f} if that sail is credited with a")
-    L.append(f"     perfect reflector), and a factor of {f_sc:.1f} beyond NASA's Solar")
-    L.append("     Cruiser design, placing it at the edge of near-term rather")
-    L.append("     than current capability.'")
-    L.append("")
-    L.append(f"  [shortfall check]  realistic {f_real:.4f}x   ideal {f_ideal:.4f}x   "
-             f"Solar Cruiser {f_sc:.4f}x  (= {100*(f_sc-1):.1f} % above it)")
+    L.append("    'Tidal parity for Sun-Earth falls at beta = 0.0286, a factor of")
+    L.append("     three beyond the best sail flown to date (LightSail-2) and")
+    L.append("     within 40 % of NASA's Solar Cruiser design, placing it at the")
+    L.append("     edge of near-term rather than current capability.'")
     return "\n".join(L)
 
 

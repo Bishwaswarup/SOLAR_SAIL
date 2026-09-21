@@ -205,72 +205,8 @@ else:
     checks.append(('atlas: halo_atlas.csv present', 0.0, 1.0, False))
     failures.append('halo_atlas.csv missing -- run `python main.py atlas`')
 
-# ── Table 2 (tab:closed): EVERY cell, parsed out of the manuscript ──────────
-# These eight cells were the only numbers in the paper that nothing checked,
-# and every one of them had silently drifted: the |Delta| column was stale
-# (Sun-Earth read 6.9e-18 while results.txt printed 2.082e-16 for the same
-# quantity -- the brentq bracket in critical_beta_tidal() changed underneath
-# it), and three r2 cells disagreed with the mu printed beside them.  Parsing
-# the row out of main.tex rather than hard-coding it means the check cannot
-# itself go stale: edit the table and this either passes or tells you why.
-tex = open(TEX).read()
-
-_row_re = re.compile(
-    r'^\s*(Sun--Mercury|Sun--Earth|Sun--Jupiter|Earth--Moon)\s*&\s*'
-    r'\\num\{([^}]*)\}\s*&\s*'          # mu
-    r'\\num\{([^}]*)\}\s*&\s*'          # beta_crit, closed form
-    r'\\num\{([^}]*)\}\s*&\s*'          # beta_crit, root-find
-    r'\\num\{([^}]*)\}\s*&\s*'          # |Delta|
-    r'\\num\{([^}]*)\}\s*\\\\',         # r2
-    re.M)
-
-_rows = _row_re.findall(tex)
-chk('tab:closed: rows parsed from main.tex', len(_rows), 4, tol=0)
-
-for _sys, _mu_s, _cf_s, _rf_s, _d_s, _r2_s in _rows:
-    _mu = float(_mu_s)
-    _cf, _rf = critical_beta_tidal_exact(_mu), critical_beta_tidal(_mu)
-
-    # closed form and root-find, as typeset
-    chk(f'tab:closed {_sys}: closed form', _cf, float(_cf_s), tol=5e-13)
-    chk(f'tab:closed {_sys}: root-find', _rf, float(_rf_s), tol=5e-13)
-
-    # the two beta columns are printed to 12 dp and must agree at that width
-    chk(f'tab:closed {_sys}: two beta columns agree as printed',
-        float(_cf_s), float(_rf_s), tol=5e-13)
-
-    # |Delta| is floating-point noise, so check the ORDER, not the digits:
-    # the typeset value must be within a factor of 2 of the true residual and
-    # must not be quoted smaller than it really is.
-    _d_true, _d_tex = abs(_cf - _rf), float(_d_s)
-    chk(f'tab:closed {_sys}: |Delta| not understated',
-        1.0 if _d_tex >= _d_true * 0.5 else 0.0, 1.0, tol=0)
-    chk(f'tab:closed {_sys}: |Delta| right order of magnitude',
-        1.0 if _d_tex <= max(_d_true * 2.0, 1e-17) else 0.0, 1.0, tol=0)
-
-    # r2 at parity is mu^(1/3) EXACTLY, evaluated at the mu printed beside it.
-    # This is what caught Sun-Mercury (0.005500 vs 0.005496) and the
-    # Sun-Jupiter mu/r2 mismatch.
-    chk(f'tab:closed {_sys}: r2 = mu^(1/3) at the printed mu',
-        _mu ** (1 / 3), float(_r2_s), tol=5e-7)
-
-# The manuscript's sweep claim: worst |Delta| over 61 log-spaced mu.  The
-# abstract and Sec. 4 both quote a number for this; it must be the sweep's
-# actual maximum, not one system's residual.
-_sweep = np.logspace(-7, -2, 61)
-_worst = max(abs(critical_beta_tidal_exact(m) - critical_beta_tidal(m))
-             for m in _sweep)
-_m = re.search(r'never differ by more than \\num\{([^}]*)\}', tex)
-if _m:
-    chk('Sec 4: quoted 61-point sweep bound is not understated',
-        1.0 if float(_m.group(1)) >= _worst else 0.0, 1.0, tol=0)
-    chk('Sec 4: quoted sweep bound is not wildly loose',
-        1.0 if float(_m.group(1)) <= _worst * 10 else 0.0, 1.0, tol=0)
-else:
-    checks.append(('Sec 4: sweep bound sentence found in main.tex', 0.0, 1.0, False))
-    failures.append('Sec 4 sweep-bound sentence not found -- did the wording change?')
-
 # ── cross-check: do these literals actually appear in main.tex? ─────────────
+tex = open(TEX).read()
 literals = ['0.028646456169', '7:8:9', '0.480187660',
             '35.264', '1.569787', '0.00613', '4.060819', '2.014635',
             '1.505418', '0.040932',

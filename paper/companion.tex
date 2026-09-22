@@ -1,0 +1,1074 @@
+% =====================================================================
+%  Derivations, conventions and diagnostics
+%  Companion to "Dissolution of the collinear structure in the
+%  solar-sail circular restricted three-body problem".
+%  Not for submission: this is the long-form working document, with
+%  every algebraic step written out and every residual explained.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\usepackage[font=small,labelfont=bf]{caption}
+
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = {[rgb]{0.12,0.22,0.45}},
+  citecolor  = {[rgb]{0.10,0.36,0.26}},
+  urlcolor   = {[rgb]{0.40,0.16,0.36}},
+  pdftitle   = {Derivations, conventions and diagnostics},
+  pdfauthor  = {Bishwaswarup}
+}
+
+\sisetup{group-minimum-digits=4, detect-all}
+
+\newcommand{\rhat}{\hat{\bm{r}}}
+\newcommand{\phat}{\hat{\bm{p}}}
+\newcommand{\qhat}{\hat{\bm{q}}}
+\newcommand{\nhat}{\hat{\bm{n}}}
+
+\title{\bfseries Derivations, conventions and diagnostics\\
+\large A companion to \emph{Dissolution of the collinear structure in the
+solar-sail circular restricted three-body problem}}
+\author{Bishwaswarup}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This is the long-form working document behind the preprint. Nothing here is new
+physics; everything is the algebra the paper compresses or states without proof,
+written out step by step, together with an account of what every reported
+residual actually measures. It exists so that each number in the manuscript can
+be checked by hand rather than taken on trust. Section~\ref{sec:resid} in
+particular explains the floating-point quantities --- the $10^{-16}$'s --- which
+are easy to misread as physics.
+
+Two honest caveats are recorded here rather than buried: the
+\num{8.1e-10} quoted in the manuscript's frequency scan is an artefact of grid
+alignment and overstates that scan's resolving power
+(Section~\ref{sec:scanresid}), and the $\Delta_z$ branch discriminant weakens by
+an order of magnitude across the sail band (Section~\ref{sec:deltaz}).
+\end{abstract}
+
+\tableofcontents
+
+% =====================================================================
+\section{Conventions, units and notation}\label{sec:conv}
+% =====================================================================
+
+\subsection{What is set to unity}
+
+The circular restricted three-body problem is non-dimensionalised so that three
+independent quantities are unity:
+\begin{enumerate}
+\item the separation of the two primaries, $L=1$;
+\item the total mass, $M_1+M_2=1$, so that the primaries have masses $1-\mu$
+      and $\mu$ with $\mu=M_2/(M_1+M_2)$;
+\item the mean motion of the primaries about their common barycentre, $n=1$,
+      which with $L=1$ and $G(M_1+M_2)=1$ is Kepler's third law
+      $n^2L^3=G(M_1+M_2)$.
+\end{enumerate}
+Setting $n=1$ fixes the unit of time. One non-dimensional (nd) time unit is
+$1/n$, and one full revolution of the primaries is $2\pi$ nd. Hence
+\begin{equation}
+  1\ \text{nd time unit} = \frac{T_{\mathrm{orbit}}}{2\pi}
+  = \frac{\SI{365.25636}{\day}}{2\pi} = \SI{58.1324}{\day}
+  \label{eq:timeunit}
+\end{equation}
+for Sun--Earth. This conversion is used nowhere in the manuscript except in the
+instability-timescale section, and it is the only place a physical time enters.
+
+Lengths convert with the primary separation. For Sun--Earth that is one
+astronomical unit,
+\begin{equation}
+  1\ \text{nd length} = \SI{1.495978707e8}{\kilo\metre} .
+  \label{eq:lengthunit}
+\end{equation}
+
+\subsection{Geometry and notation}
+
+The synodic (co-rotating) frame places the larger primary at $x=-\mu$ and the
+smaller at $x=1-\mu$, both on the $x$-axis, with the $z$-axis normal to the
+orbital plane. Distances from the primaries are
+\begin{equation}
+  r_1^2 = (x+\mu)^2+y^2+z^2, \qquad
+  r_2^2 = (x-1+\mu)^2+y^2+z^2 .
+\end{equation}
+
+Table~\ref{tab:notation} collects the symbols. The single most important one is
+$\beta$, the \emph{lightness number}: the ratio of the sail's
+radiation-pressure acceleration to the local solar gravitational acceleration.
+Because both fall off as $1/r_1^2$, this ratio is a constant of the sail, not a
+function of position --- which is exactly why a face-on sail can be absorbed
+into a rescaling of the primary's mass.
+
+\begin{table}[t]
+  \centering
+  \caption{Notation.}
+  \label{tab:notation}
+  \begin{tabular}{ll}
+    \toprule
+    symbol & meaning \\
+    \midrule
+    $\mu$                    & mass ratio $M_2/(M_1+M_2)$ \\
+    $\beta$                  & lightness number, sail acceleration $/$ solar gravity \\
+    $r_1,\;r_2$              & distances to the larger and smaller primary \\
+    $\gamma$                 & local length scale $\lvert(1-\mu)-x_{\mathrm{eq}}\rvert$ \\
+    $r_H$                    & Hill radius $(\mu/3)^{1/3}$ \\
+    $U$                      & modified pseudo-potential, eq.~\eqref{eq:U} \\
+    $A\equiv c_2$            & second Legendre coefficient of the collinear expansion \\
+    $S,\;s$                  & the solar and tidal contributions to $A$, eq.~\eqref{eq:Asplit} \\
+    $\kappa$                 & the level at which $s$ is held, $s=\kappa$ \\
+    $\lambda_u$              & unstable (saddle) exponent, in-plane \\
+    $\omega$                 & in-plane centre frequency \\
+    $\nu$                    & out-of-plane frequency \\
+    $\tau_u$                 & instability e-folding time, $1/\lambda_u$ \\
+    $\alpha,\;\delta$        & sail cone and clock angles \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Equations of motion}\label{sec:eom}
+% =====================================================================
+
+\subsection{The rotating frame}
+
+In an inertial frame the massless particle obeys Newtonian gravitation from two
+point masses on circular orbits. Transforming to the frame rotating with the
+primaries at unit angular velocity $\bm{\Omega}=\hat{\bm{z}}$ introduces the
+centrifugal and Coriolis accelerations,
+\begin{equation}
+  \bm{a}_{\mathrm{rot}} = \bm{a}_{\mathrm{in}}
+  - 2\,\bm{\Omega}\times\dot{\bm{r}}
+  - \bm{\Omega}\times(\bm{\Omega}\times\bm{r}) .
+\end{equation}
+With $\bm{\Omega}=\hat{\bm{z}}$ one has
+$\bm{\Omega}\times\dot{\bm{r}}=(-\dot y,\dot x,0)$ and
+$-\bm{\Omega}\times(\bm{\Omega}\times\bm{r})=(x,y,0)$. The centrifugal term is
+the gradient of $\tfrac12(x^2+y^2)$, so it can be folded into a potential; the
+Coriolis term cannot, because it depends on velocity. This asymmetry is the
+reason the in-plane and out-of-plane linearisations behave so differently
+(Section~\ref{sec:lin}) and, ultimately, the reason a purely transverse control
+input can still reach the in-plane radial direction (Section~\ref{sec:control}).
+
+Collecting terms, and writing $P$ and $Q$ for the two gravitational strengths,
+\begin{equation}
+  \ddot x - 2\dot y = \frac{\partial U}{\partial x}, \qquad
+  \ddot y + 2\dot x = \frac{\partial U}{\partial y}, \qquad
+  \ddot z         = \frac{\partial U}{\partial z},
+  \label{eq:eom}
+\end{equation}
+\begin{equation}
+  U = \tfrac12(x^2+y^2) + \frac{P}{r_1} + \frac{Q}{r_2},
+  \qquad P=(1-\beta)(1-\mu), \quad Q=\mu .
+  \label{eq:U}
+\end{equation}
+Setting $\beta=0$ gives $P=1-\mu$ and recovers the classical CR3BP.
+
+\subsection{The sail force and why \texorpdfstring{$P=(1-\beta)(1-\mu)$}{P=(1-beta)(1-mu)}}
+
+For an ideal specular reflector the force is along the sail normal with
+magnitude proportional to $\cos^2\alpha$:
+\begin{equation}
+  \bm{a}_{\mathrm{sail}} = \beta\,\frac{1-\mu}{r_1^2}\,\cos^2\alpha\;\nhat ,
+  \qquad
+  \nhat = \cos\alpha\,\rhat + \sin\alpha\cos\delta\,\phat
+        + \sin\alpha\sin\delta\,\qhat .
+  \label{eq:sail}
+\end{equation}
+One factor of $\cos\alpha$ comes from the projected area the sail presents to
+the Sun; the second comes from the fact that only the component of incoming
+momentum normal to the sail is reversed. A perfect \emph{absorber} differs: the
+force lies along the Sun line with magnitude $\propto\cos\alpha$, one factor
+only. The two models coincide at $\alpha=0$, which is the only case the bulk of
+the manuscript uses.
+
+At $\alpha=0$, $\nhat=\rhat$ and \eqref{eq:sail} reduces to
+\begin{equation}
+  \bm{a}_{\mathrm{sail}} = \beta\,\frac{1-\mu}{r_1^2}\,\rhat ,
+\end{equation}
+which is a central inverse-square force directed away from the larger primary.
+It is therefore derivable from the potential $-\beta(1-\mu)/r_1$, and adding it
+to the gravitational term $+(1-\mu)/r_1$ gives $+(1-\beta)(1-\mu)/r_1$. This is
+the whole content of the statement that \emph{a face-on sail rescales solar
+gravity}: the problem is not perturbed, it is a CR3BP with a different mass for
+the larger primary. Every exact result in the manuscript follows from this one
+observation.
+
+For $\alpha\neq0$ the force acquires a transverse component, is no longer
+central, and no potential exists --- hence no Jacobi integral, and hence the
+restriction of Sections 3--6 of the manuscript to $\alpha=0$.
+
+\subsection{The Jacobi integral}
+
+Because \eqref{eq:eom} is autonomous with a velocity-independent potential and a
+Coriolis term that does no work,
+\begin{equation}
+  \frac{\mathrm{d}}{\mathrm{d}t}\Bigl(2U-v^2\Bigr)
+  = 2\nabla U\cdot\dot{\bm r} - 2\,\dot{\bm r}\cdot\ddot{\bm r} = 0
+\end{equation}
+after substituting \eqref{eq:eom}, since
+$\dot{\bm r}\cdot(\bm\Omega\times\dot{\bm r})=0$. Therefore
+\begin{equation}
+  C_{\mathrm{sail}} = 2U - v^2
+  \label{eq:jacobi}
+\end{equation}
+is conserved, with $U$ the \emph{modified} potential \eqref{eq:U}. The
+gravitational Jacobi constant built from $(1-\mu)/r_1$ instead differs by
+\begin{equation}
+  C_{\mathrm{grav}} = C_{\mathrm{sail}} + \frac{2\beta(1-\mu)}{r_1},
+  \label{eq:cgrav}
+\end{equation}
+and since $r_1$ varies along an orbit, $C_{\mathrm{grav}}$ is \emph{not}
+conserved for $\beta\neq0$. Section~\ref{sec:jacobiresid} quantifies both.
+
+% =====================================================================
+\section{The exact identity \texorpdfstring{$r_1+r_2=1$}{r1+r2=1}}\label{sec:unitsum}
+% =====================================================================
+
+On the segment of the $x$-axis strictly between the primaries,
+$-\mu<x<1-\mu$, one has $x+\mu>0$ and $x-1+\mu<0$, so
+\begin{equation}
+  r_1 = x+\mu, \qquad r_2 = (1-\mu)-x,
+  \label{eq:r1r2}
+\end{equation}
+and therefore
+\begin{equation}
+  r_1+r_2 = (x+\mu) + (1-\mu) - x = 1
+  \label{eq:sum}
+\end{equation}
+identically, for every $x$ in the interval and every $\mu$. This is not an
+approximation and involves no expansion in $\mu$. It is worth emphasising
+because the standard treatment of collinear points works with
+$\gamma=r_2$ and expands in $\gamma$, generating series in $\mu^{1/3}$; here no
+series is needed. Equation~\eqref{eq:sum} is what makes the closed form of
+Section~\ref{sec:closed} exact rather than asymptotic: imposing a condition on
+$r_2$ immediately fixes $r_1=1-r_2$ with no error term.
+
+% =====================================================================
+\section{Linearisation at a collinear equilibrium}\label{sec:lin}
+% =====================================================================
+
+\subsection{The equilibrium condition}
+
+An equilibrium on the axis has $y=z=\dot x=\dot y=\dot z=0$ and
+$\partial U/\partial x=0$. Differentiating \eqref{eq:U},
+\begin{equation}
+  \frac{\partial U}{\partial x}
+  = x - \frac{P(x+\mu)}{r_1^3} - \frac{Q(x-1+\mu)}{r_2^3} .
+\end{equation}
+Using \eqref{eq:r1r2}, $x+\mu=r_1$ and $x-1+\mu=-r_2$, so
+\begin{equation}
+  \frac{\partial U}{\partial x} = x - \frac{P}{r_1^2} + \frac{Q}{r_2^2},
+\end{equation}
+and the equilibrium satisfies
+\begin{equation}
+  \boxed{\;x = \frac{P}{r_1^2} - \frac{Q}{r_2^2}
+           = \frac{(1-\beta)(1-\mu)}{r_1^2} - \frac{\mu}{r_2^2}\;}
+  \label{eq:balance}
+\end{equation}
+This is the on-axis force balance used throughout. Read physically: the
+centrifugal term $x$ balances the reduced solar attraction minus the smaller
+primary's pull.
+
+\subsection{Second derivatives on the axis}
+
+Write $\Phi=1/r_1$. Then
+\begin{equation}
+  \frac{\partial\Phi}{\partial x} = -\frac{x+\mu}{r_1^3},
+  \qquad
+  \frac{\partial^2\Phi}{\partial x^2}
+  = -\frac{1}{r_1^3} + \frac{3(x+\mu)^2}{r_1^5} .
+\end{equation}
+Evaluated on the axis, $(x+\mu)^2=r_1^2$, so
+\begin{equation}
+  \left.\frac{\partial^2\Phi}{\partial x^2}\right|_{\mathrm{axis}}
+  = -\frac{1}{r_1^3} + \frac{3r_1^2}{r_1^5} = \frac{2}{r_1^3} .
+\end{equation}
+For the transverse directions, $\partial^2\Phi/\partial y^2
+= -1/r_1^3 + 3y^2/r_1^5$, which on the axis ($y=0$) is $-1/r_1^3$; identically
+for $z$. The same computation for $1/r_2$ gives $+2/r_2^3$ and $-1/r_2^3$,
+because $(x-1+\mu)^2=r_2^2$ on the axis regardless of sign.
+
+Adding the centrifugal part $\tfrac12(x^2+y^2)$, whose second derivatives are
+$1,1,0$:
+\begin{equation}
+  U_{xx} = 1 + 2A, \qquad U_{yy} = 1 - A, \qquad U_{zz} = -A,
+  \label{eq:hessian}
+\end{equation}
+\begin{equation}
+  A = \underbrace{\frac{(1-\beta)(1-\mu)}{r_1^3}}_{\textstyle S}
+    + \underbrace{\frac{\mu}{r_2^3}}_{\textstyle s} .
+  \label{eq:Asplit}
+\end{equation}
+All the cross terms $U_{xy},U_{xz},U_{yz}$ vanish on the axis by symmetry, so
+the Hessian is diagonal and the $z$ motion decouples exactly at linear order.
+
+\subsection{The out-of-plane mode}
+
+From \eqref{eq:eom} and \eqref{eq:hessian}, the vertical perturbation
+$\zeta=z$ obeys
+\begin{equation}
+  \ddot\zeta = U_{zz}\,\zeta = -A\,\zeta
+  \qquad\Longrightarrow\qquad
+  \ddot\zeta + A\zeta = 0 ,
+\end{equation}
+a pure harmonic oscillator with
+\begin{equation}
+  \boxed{\;\nu = \sqrt{A}\;}
+  \label{eq:nu}
+\end{equation}
+provided $A>0$, which holds for every collinear point. There is no Coriolis
+coupling out of plane because $\bm\Omega\times\dot{\bm r}$ has no $z$
+component. \textbf{Physical meaning:} $\nu$ is the frequency at which a
+spacecraft displaced above the ecliptic oscillates through it. Its period is
+$2\pi/\nu$ in nd time.
+
+\subsection{The in-plane modes and the characteristic quartic}
+
+Write $\xi=x-x_{\mathrm{eq}}$, $\eta=y$. The linearised in-plane system is
+\begin{equation}
+  \ddot\xi - 2\dot\eta = (1+2A)\,\xi, \qquad
+  \ddot\eta + 2\dot\xi = (1-A)\,\eta .
+  \label{eq:inplane}
+\end{equation}
+Seek $\xi=X\mathrm{e}^{\lambda t}$, $\eta=Y\mathrm{e}^{\lambda t}$:
+\begin{align}
+  (\lambda^2 - 1 - 2A)\,X - 2\lambda\,Y &= 0, \\
+  2\lambda\,X + (\lambda^2 - 1 + A)\,Y &= 0 .
+\end{align}
+A non-trivial solution requires the determinant to vanish:
+\begin{equation}
+  (\lambda^2-1-2A)(\lambda^2-1+A) + 4\lambda^2 = 0 .
+\end{equation}
+Put $u=\lambda^2$ and expand fully:
+\begin{align}
+  (u-1-2A)(u-1+A)
+  &= u^2 - u + Au - u + 1 - A - 2Au + 2A - 2A^2 \notag\\
+  &= u^2 + u(-2 - A) + (1 + A - 2A^2) .
+\end{align}
+Adding $4u$,
+\begin{equation}
+  \boxed{\;u^2 + (2-A)\,u + \bigl(1+A-2A^2\bigr) = 0\;}
+  \label{eq:quartic}
+\end{equation}
+which is the quartic $\lambda^4+(2-A)\lambda^2+(1+A-2A^2)=0$ in $\lambda$.
+
+\subsection{Solving it}
+
+The discriminant is
+\begin{align}
+  (2-A)^2 - 4(1+A-2A^2)
+  &= 4 - 4A + A^2 - 4 - 4A + 8A^2 \notag\\
+  &= 9A^2 - 8A = A(9A-8) \;\equiv\; D^2 .
+\end{align}
+Hence
+\begin{equation}
+  u_{\pm} = \tfrac12\Bigl[(A-2) \pm D\Bigr], \qquad
+  D = \sqrt{A(9A-8)} .
+  \label{eq:roots}
+\end{equation}
+The product of the roots is $u_+u_- = 1+A-2A^2 = -(2A+1)(A-1)$. For $A>1$ this
+is strictly negative, so the two roots have opposite signs: one positive, one
+negative. Therefore
+\begin{equation}
+  \boxed{\;\lambda_u^2 = \tfrac12\bigl[(A-2)+D\bigr], \qquad
+          \omega^2 = \tfrac12\bigl[D-(A-2)\bigr]\;}
+  \label{eq:rates}
+\end{equation}
+with $\lambda_u$ real (the saddle) and $\omega$ real (the centre, since
+$u_-=-\omega^2<0$ gives $\lambda=\pm\mathrm{i}\omega$).
+
+The condition $A>1$ is exactly the condition for a real hyperbolic pair. At
+$A=1$ the product vanishes and one root goes to zero; for $A<1$ both roots are
+negative and the point is linearly stable in plane. Every classical collinear
+point has $A>1$, and a sail drives $A\to1^+$ from above but never below
+(Section~\ref{sec:closed}).
+
+\subsection{What the three rates mean}\label{sec:meaning}
+
+This is worth stating plainly, because the manuscript uses all three without
+defining them operationally.
+
+\begin{description}
+\item[$\lambda_u$ --- the saddle exponent.] A perturbation along the unstable
+eigenvector grows as $\mathrm{e}^{\lambda_u t}$. Its reciprocal
+$\tau_u=1/\lambda_u$ is the \emph{e-folding time}: the time for a departure to
+grow by a factor $\mathrm{e}\approx2.718$. This is the number that determines
+station-keeping cadence. For the classical Sun--Earth $L_1$,
+$\lambda_u=\num{2.53256}$ nd, so by \eqref{eq:timeunit}
+$\tau_u=\SI{58.1324}{\day}/2.53256=\SI{22.95}{\day}$ --- the familiar figure
+quoted for $L_1$ halo missions. That the model returns it without being tuned
+to is a check on \eqref{eq:rates}.
+
+\item[$\omega$ --- the in-plane centre frequency.] The planar Lyapunov orbits
+about the equilibrium have period $2\pi/\omega$ at infinitesimal amplitude.
+Physically it is the epicyclic frequency of the libration in the
+$(x,y)$ plane, modified by the two primaries' tidal fields.
+
+\item[$\nu$ --- the out-of-plane frequency.] The vertical Lyapunov orbits have
+period $2\pi/\nu$ at infinitesimal amplitude.
+\end{description}
+
+\noindent\textbf{Why the ratio $\nu/\omega$ matters.} A halo orbit is a
+three-dimensional periodic orbit in which the in-plane and out-of-plane motions
+share a common period. At linear order this is impossible unless
+$\nu/\omega=1$ exactly. Halo families therefore bifurcate from the planar
+Lyapunov family at finite amplitude, where nonlinear frequency corrections close
+the gap. The closer $\nu/\omega$ is to unity at linear order, the smaller the
+amplitude at which the halo family appears. The manuscript's bound
+\eqref{eq:band} says this gap is never larger than \SI{5.72}{\percent} and
+never zero.
+
+% =====================================================================
+\section{The identity \texorpdfstring{$A\equiv c_2$}{A = c2}}\label{sec:c2}
+% =====================================================================
+
+Richardson's expansion of the collinear dynamics writes the potential as a
+series in Legendre polynomials with coefficients
+\begin{equation}
+  c_n = \frac{1}{\gamma^3}\left[\mu
+        + (-1)^n\,\frac{(1-\mu)\,\gamma^{\,n+1}}{(1-\gamma)^{\,n+1}}\right],
+\end{equation}
+$\gamma$ being the distance from the smaller primary to the libration point.
+For $n=2$, with $\gamma=r_2$ and $1-\gamma=r_1$ by \eqref{eq:sum},
+\begin{equation}
+  c_2 = \frac{\mu}{r_2^3} + \frac{1-\mu}{r_1^3},
+\end{equation}
+which is precisely \eqref{eq:Asplit} at $\beta=0$. Hence $A$ is not a new
+quantity: it is the second Legendre coefficient, and the sail's sole effect is
+to replace $(1-\mu)$ by $(1-\beta)(1-\mu)$ inside it. This is the compact
+statement that \emph{a sail continuously detunes $c_2$}, a parameter otherwise
+fixed once the system and the libration point are chosen. The manuscript
+verifies the identity numerically to $<10^{-13}$ at three systems.
+
+% =====================================================================
+\section{The tidal-parity threshold, in full}\label{sec:closed}
+% =====================================================================
+
+\subsection{The condition}
+
+Define the \emph{saddle strength} $s=\mu/r_2^3$, the smaller primary's direct
+contribution to $A$ in \eqref{eq:Asplit}. Tidal parity is the level
+\begin{equation}
+  s = 1
+  \qquad\Longleftrightarrow\qquad
+  \frac{\mu}{r_2^3}=1
+  \qquad\Longleftrightarrow\qquad
+  r_2 = \mu^{1/3} .
+  \label{eq:parity}
+\end{equation}
+Since the Hill radius is $r_H=(\mu/3)^{1/3}$,
+\begin{equation}
+  \frac{r_2}{r_H} = \frac{\mu^{1/3}}{(\mu/3)^{1/3}} = 3^{1/3} = 1.4422\ldots
+\end{equation}
+independently of $\mu$ --- the parity radius is always $3^{1/3}$ Hill radii.
+
+\subsection{The substitution, term by term}
+
+Impose \eqref{eq:parity} on the balance \eqref{eq:balance}. Three substitutions
+are needed, and each is exact:
+\begin{align}
+  r_2 &= \mu^{1/3}, \\
+  r_1 &= 1 - r_2 = 1 - \mu^{1/3}
+        &&\text{by \eqref{eq:sum}, no error term}, \\
+  \frac{\mu}{r_2^2} &= \frac{\mu}{\mu^{2/3}} = \mu^{1/3}
+        &&\text{the tidal term equals the standoff}, \\
+  x &= (1-\mu) - r_2 = (1-\mu) - \mu^{1/3}
+        &&\text{by \eqref{eq:r1r2}} .
+\end{align}
+The third line is the crux and deserves emphasis: at $s=1$, and only there, the
+smaller primary's gravitational acceleration at the equilibrium,
+$\mu/r_2^2$, is numerically equal to the equilibrium's distance from that
+primary, $r_2$. Substituting into \eqref{eq:balance},
+\begin{equation}
+  \underbrace{(1-\mu)-\mu^{1/3}}_{x}
+  = \frac{(1-\beta)(1-\mu)}{\bigl(1-\mu^{1/3}\bigr)^2}
+    - \underbrace{\mu^{1/3}}_{\mu/r_2^2} .
+\end{equation}
+The $-\mu^{1/3}$ appears on both sides and cancels identically, leaving
+\begin{equation}
+  1-\mu = \frac{(1-\beta)(1-\mu)}{\bigl(1-\mu^{1/3}\bigr)^2} .
+\end{equation}
+Dividing by $(1-\mu)$, which is non-zero for $\mu<1$,
+\begin{equation}
+  1-\beta = \bigl(1-\mu^{1/3}\bigr)^2
+\end{equation}
+and therefore
+\begin{equation}
+  \boxed{\;\beta_{\mathrm{crit}}
+   = 1 - \bigl(1-\mu^{1/3}\bigr)^2
+   = 2\mu^{1/3} - \mu^{2/3}\;}
+  \label{eq:closedform}
+\end{equation}
+Expanding the square gives $1-(1-2\mu^{1/3}+\mu^{2/3})=2\mu^{1/3}-\mu^{2/3}$.
+
+\subsection{Why this is exact}
+
+Three features make it so. First, \eqref{eq:sum} is an identity, not a leading
+term. Second, the condition $s=1$ fixes $r_2$ in closed form, so nothing needs
+to be solved numerically. Third, the cancellation is algebraic --- it does not
+rely on $\mu$ being small. Consequently \eqref{eq:closedform} holds for
+$\mu=\tfrac12$ as well as for $\mu=10^{-7}$. To leading order
+$\beta_{\mathrm{crit}}\simeq2\mu^{1/3}$, but the exact form costs nothing.
+
+\subsection{The linear structure at parity}
+
+At parity $r_2=\mu^{1/3}$ and $r_1=1-\mu^{1/3}$, so from \eqref{eq:Asplit}
+\begin{equation}
+  S = \frac{(1-\beta)(1-\mu)}{r_1^3}
+    = \frac{(1-\mu^{1/3})^2(1-\mu)}{(1-\mu^{1/3})^3}
+    = \frac{1-\mu}{1-\mu^{1/3}} ,
+\end{equation}
+using $1-\beta=r_1^2$. Hence
+\begin{equation}
+  A^{\mathrm{parity}} = 1 + \frac{1-\mu}{1-\mu^{1/3}} ,
+  \label{eq:Aparity}
+\end{equation}
+which for Sun--Earth is $2.014635$, not $2$. The naive identification
+$A-1=s$ is therefore short by
+\begin{equation}
+  \frac{A-2}{A} = \frac{0.014635}{2.014635} = \SI{0.7265}{\percent},
+\end{equation}
+quoted as \SI{0.73}{\percent} in the manuscript. The discrepancy is
+$S-1=O(\mu^{1/3})$ and reflects the smaller primary's \emph{indirect} effect:
+it displaces the equilibrium, which changes $r_1$, which changes $S$.
+
+% =====================================================================
+\section{The tidal-strength hierarchy}\label{sec:kappa}
+% =====================================================================
+
+\subsection{Generalising the level}
+
+Replace \eqref{eq:parity} by $s=\kappa$ for arbitrary $\kappa>0$:
+\begin{equation}
+  \frac{\mu}{r_2^3}=\kappa
+  \quad\Longrightarrow\quad
+  r_2(\kappa) = \Bigl(\frac{\mu}{\kappa}\Bigr)^{1/3}
+              = \Bigl(\frac{3}{\kappa}\Bigr)^{1/3} r_H .
+  \label{eq:r2kappa}
+\end{equation}
+Again $r_1=1-r_2$ exactly. The tidal term is now
+\begin{equation}
+  \frac{\mu}{r_2^2} = \mu\Bigl(\frac{\kappa}{\mu}\Bigr)^{2/3}
+                    = \mu^{1/3}\kappa^{2/3},
+\end{equation}
+while the standoff is $r_2=\mu^{1/3}\kappa^{-1/3}$. Substituting into
+\eqref{eq:balance},
+\begin{equation}
+  (1-\mu)-r_2 = \frac{(1-\beta)(1-\mu)}{r_1^2} - \mu^{1/3}\kappa^{2/3},
+\end{equation}
+so
+\begin{equation}
+  \frac{(1-\beta)(1-\mu)}{r_1^2}
+  = (1-\mu) \;\underbrace{-\,r_2 + \mu^{1/3}\kappa^{2/3}}_{\textstyle\Delta(\kappa)} .
+\end{equation}
+The residue is
+\begin{equation}
+  \Delta(\kappa) = -\mu^{1/3}\kappa^{-1/3} + \mu^{1/3}\kappa^{2/3}
+                 = \mu^{1/3}\kappa^{-1/3}\bigl(\kappa-1\bigr),
+  \label{eq:residue}
+\end{equation}
+and rearranging gives the general closed form
+\begin{equation}
+  \boxed{\;\beta(\kappa) = 1 - \frac{(1-r_2)^2}{1-\mu}
+    \Bigl[(1-\mu) + \mu^{1/3}\kappa^{-1/3}(\kappa-1)\Bigr]\;}
+  \label{eq:betakappa}
+\end{equation}
+
+\subsection{Why \texorpdfstring{$\kappa=1$}{kappa=1} is distinguished}
+
+From \eqref{eq:residue}, $\Delta(\kappa)=0$ if and only if $\kappa=1$, since
+$\mu^{1/3}\kappa^{-1/3}>0$ for all admissible $\mu,\kappa$. At that level and
+no other, \eqref{eq:betakappa} collapses to
+\begin{equation}
+  1-\beta = (1-r_2)^2 = \bigl(1-\mu^{1/3}\bigr)^2,
+\end{equation}
+recovering \eqref{eq:closedform}.
+
+The statement to make is therefore precise, and slightly weaker than one might
+hope: a closed form exists for \emph{every} $\kappa$ --- the algebra never
+requires a numerical root. What is special about $\kappa=1$ is that the smaller
+primary's direct term drops out of the balance identically, leaving a threshold
+that is a pure square in $\mu^{1/3}$ with no residual $\kappa$-dependence. This
+answers the objection that $s=1$ is merely a choice of units: it is the unique
+level at which the tidal acceleration and the standoff coincide,
+$\mu/r_2^2=r_2$, and that coincidence is a property of the force balance.
+
+\subsection{Both of the manuscript's markers are members}
+
+Because $r_2/r_H=(3/\kappa)^{1/3}$ by \eqref{eq:r2kappa}:
+\begin{itemize}
+\item $\kappa=3$ gives $r_2/r_H=1$ exactly --- the Hill-sphere exit criterion,
+      at $\beta=\num{2.98e-4}$;
+\item $\kappa=1$ gives $r_2/r_H=3^{1/3}=1.4422$ --- tidal parity, at
+      $\beta=\num{0.028646}$;
+\item the classical $L_1$ itself sits at $\kappa=s(\beta{=}0)=3.0303$, just
+      inside the Hill sphere at $r_2=0.9967\,r_H$.
+\end{itemize}
+The two markers the manuscript treats separately --- one adopted, one dismissed
+as ``not a useful discriminant'' --- are the same object at two levels.
+
+% =====================================================================
+\section{The frequency ratio}\label{sec:freq}
+% =====================================================================
+
+\subsection{Forming the ratio}
+
+From \eqref{eq:nu} and \eqref{eq:rates}, with $c_2\equiv A$,
+\begin{equation}
+  \frac{\nu^2}{\omega^2}
+  = \frac{c_2}{\tfrac12\bigl[D-(c_2-2)\bigr]}
+  = \frac{2c_2}{D-(c_2-2)},
+  \qquad D=\sqrt{c_2(9c_2-8)} .
+  \label{eq:R}
+\end{equation}
+Note this depends on $c_2$ alone --- $\mu$ and $\beta$ enter only through
+$c_2$. Any statement about this ratio is therefore a statement about the
+collinear normal form itself, shared by every three-body system.
+
+\subsection{The stationary point}
+
+Write $R=2c/M$ with $M=D-c+2$ and $D=\sqrt{9c^2-8c}$. Then
+\begin{equation}
+  \frac{\mathrm{d}D}{\mathrm{d}c}=\frac{18c-8}{2D}=\frac{9c-4}{D},
+  \qquad
+  M' = \frac{9c-4}{D}-1 .
+\end{equation}
+By the quotient rule,
+\begin{equation}
+  \frac{\mathrm{d}R}{\mathrm{d}c} = \frac{2M-2cM'}{M^2},
+\end{equation}
+which vanishes when $M=cM'$:
+\begin{equation}
+  D-c+2 = c\left(\frac{9c-4}{D}-1\right) = \frac{c(9c-4)}{D}-c .
+\end{equation}
+The $-c$ cancels on both sides, leaving $D+2=c(9c-4)/D$, i.e.
+\begin{equation}
+  D^2+2D = 9c^2-4c .
+\end{equation}
+Since $D^2=9c^2-8c$,
+\begin{equation}
+  9c^2-8c+2D = 9c^2-4c
+  \quad\Longrightarrow\quad
+  2D = 4c
+  \quad\Longrightarrow\quad
+  D = 2c .
+\end{equation}
+Squaring, $4c^2=9c^2-8c$, so $5c^2=8c$ and (discarding $c=0$)
+\begin{equation}
+  \boxed{\;c_2^\star = \tfrac85\;}
+  \label{eq:cstar}
+\end{equation}
+
+\subsection{The rates there, and the \texorpdfstring{$7:8:9$}{7:8:9} ratio}
+
+At $c_2=8/5$, $D=2c_2=16/5$. From \eqref{eq:rates} and \eqref{eq:nu}:
+\begin{align}
+  \lambda_u^2 &= \tfrac12\bigl[(\tfrac85-2)+\tfrac{16}5\bigr]
+               = \tfrac12\bigl[-\tfrac25+\tfrac{16}5\bigr]
+               = \tfrac12\cdot\tfrac{14}5 = \tfrac75, \\
+  \nu^2       &= c_2 = \tfrac85, \\
+  \omega^2    &= \tfrac12\bigl[\tfrac{16}5+\tfrac25\bigr]
+               = \tfrac12\cdot\tfrac{18}5 = \tfrac95 .
+\end{align}
+Hence
+\begin{equation}
+  \lambda_u^2:\nu^2:\omega^2 = \tfrac75:\tfrac85:\tfrac95 = 7:8:9,
+\end{equation}
+and
+\begin{equation}
+  \left.\frac{\nu}{\omega}\right|_{c_2^\star}
+  = \sqrt{\tfrac89} = \frac{2\sqrt2}{3} = 0.942809041582\ldots
+  \label{eq:bound}
+\end{equation}
+
+\subsection{The endpoints}
+
+\textbf{As $c_2\to1^+$:} $D=\sqrt{1\cdot1}=1$, so
+$\omega^2=\tfrac12[1-(-1)]=1$ and $\nu^2=1$; the ratio tends to $1$. This is
+the hovering limit, where the planar roots become $\lambda^2\in\{0,-1\}$ and
+the in-plane period is driven to exactly $2\pi$ --- one year for Sun--Earth.
+That is the Keplerian epicyclic degeneracy of an inverse-square field, not a
+resonance with the smaller primary.
+
+\textbf{As $c_2\to\infty$:} $D=3c_2\sqrt{1-8/(9c_2)}\simeq3c_2-\tfrac43$, so
+\begin{equation}
+  \omega^2 \simeq \tfrac12\bigl[3c_2-\tfrac43-c_2+2\bigr] = c_2+\tfrac13,
+  \qquad
+  \frac{\nu^2}{\omega^2}\simeq\frac{c_2}{c_2+\tfrac13}\to1 .
+\end{equation}
+So the ratio approaches unity at both ends and dips to $2\sqrt2/3$ in between.
+The band is therefore
+\begin{equation}
+  \frac{\nu}{\omega}\in\Bigl[\tfrac{2\sqrt2}{3},\,1\Bigr),
+  \qquad \text{width } 1-\tfrac{2\sqrt2}{3}=\SI{5.719}{\percent} .
+  \label{eq:band}
+\end{equation}
+The interval is closed on the left (the bound is attained at $c_2=8/5$) and
+open on the right (unity is approached but never reached for finite $c_2>1$).
+
+% =====================================================================
+\section{Which commensurabilities the band admits}\label{sec:reso}
+% =====================================================================
+
+The manuscript originally tested fourteen low-order rationals and found none
+inside \eqref{eq:band}. That is true but weaker than necessary, and the
+stronger statement is elementary.
+
+Let $p/q$ with $0<p<q$ be a rational in lowest terms. For a fixed denominator
+$q$, the largest such rational strictly below $1$ is $(q-1)/q$. Therefore
+$p/q\in[2\sqrt2/3,1)$ requires
+\begin{equation}
+  \frac{q-1}{q}\;\geq\;\frac{2\sqrt2}{3}
+  \quad\Longleftrightarrow\quad
+  1-\frac1q\geq\frac{2\sqrt2}{3}
+  \quad\Longleftrightarrow\quad
+  q \geq \frac{1}{1-2\sqrt2/3} = 17.4853\ldots
+\end{equation}
+so $q\geq18$. Hence:
+\begin{itemize}
+\item \textbf{No} rational with denominator $q\leq17$ lies in the band at all.
+\item The lowest-denominator one that does is $17{:}18=0.9444\ldots$, of
+      order $p+q=35$.
+\item The fourteen tested rationals have $q\leq9$ and are excluded without
+      being tested individually.
+\end{itemize}
+
+It is important to state the converse honestly: the band is \emph{not}
+resonance-free. It is an interval of positive length, so it contains infinitely
+many rationals --- $18{:}19$, $19{:}20$, and so on. The correct claim is that
+every commensurability it admits is of order $35$ or higher, which is far beyond
+what any perturbation theory would retain, and that no commensurability
+underwrites tidal parity.
+
+% =====================================================================
+\section{The instability timescale}\label{sec:tau}
+% =====================================================================
+
+Define
+\begin{equation}
+  \tau_u = \frac{1}{\lambda_u}, \qquad
+  N_{\mathrm{efold}} = \lambda_u\,T_{\mathrm{mission}} ,
+  \label{eq:tau}
+\end{equation}
+with $\lambda_u$ in nd units. Converting with \eqref{eq:timeunit},
+\begin{equation}
+  \tau_u\,[\mathrm{days}] = \frac{\SI{58.1324}{\day}}{\lambda_u\,[\mathrm{nd}]} .
+\end{equation}
+At $\beta=0$, $\lambda_u=2.53256$ gives $\tau_u=\SI{22.95}{\day}$. At tidal
+parity, $\lambda_u=1.505418$ gives $\tau_u=\SI{38.62}{\day}$.
+
+Inverting $N_{\mathrm{efold}}=1$ for $\beta$ requires a numerical root because
+$\lambda_u(\beta)$ is transcendental: one solves
+$\lambda_u(\beta)=\SI{58.1324}{\day}/T$ by bisection on the monotone decreasing
+function $\lambda_u$. The results are in the manuscript's Table 4. Note this
+threshold is \emph{not} $\mu$-independent and \emph{not} exact --- it depends on
+the mission horizon chosen, which is an engineering input, not a property of the
+dynamics. It is reported because it is the operationally meaningful reading,
+not because it is a sharper result than \eqref{eq:closedform}.
+
+% =====================================================================
+\section{Sail control authority}\label{sec:control}
+% =====================================================================
+
+\subsection{The orthonormal triad}
+
+The triad in \eqref{eq:sail} must be orthonormal. Take
+\begin{equation}
+  \rhat = \frac{\bm r-\bm r_1}{r_1}, \qquad
+  \phat = \frac{\hat{\bm k}\times\rhat}{\lVert\hat{\bm k}\times\rhat\rVert},
+  \qquad
+  \qhat = \rhat\times\phat .
+\end{equation}
+A common shortcut substitutes $\hat{\bm k}$ itself for $\qhat$. That fails off
+the ecliptic because $\rhat\cdot\hat{\bm k}=z/r_1\neq0$, and then
+\begin{equation}
+  \lVert\nhat\rVert^2 = 1 + \sin(2\alpha)\sin\delta\,\frac{z}{r_1},
+\end{equation}
+so the ``unit'' normal is not a unit vector. The error is maximised when
+$\sin(2\alpha)\sin\delta=1$, giving
+$\lVert\nhat\rVert-1=\sqrt{1+z/r_1}-1$, i.e. \SI{0.995}{\percent} at
+$z/r_1=0.02$ and \SI{4.40}{\percent} at $z/r_1=0.09$. It vanishes identically at
+$\alpha=0$, so no face-on result is affected.
+
+\subsection{Differentiating the sail acceleration}
+
+Write $k=\beta(1-\mu)/r_1^2$. From \eqref{eq:sail},
+\begin{equation}
+  \bm a = k\Bigl[\cos^3\!\alpha\,\rhat
+        + \cos^2\!\alpha\sin\alpha\cos\delta\,\phat
+        + \cos^2\!\alpha\sin\alpha\sin\delta\,\qhat\Bigr] .
+\end{equation}
+Differentiating with respect to the clock angle,
+\begin{equation}
+  \frac{\partial\bm a}{\partial\delta}
+  = k\cos^2\!\alpha\sin\alpha\bigl[-\sin\delta\,\phat+\cos\delta\,\qhat\bigr],
+  \label{eq:dadelta}
+\end{equation}
+which carries an overall factor $\sin\alpha$ and therefore
+\begin{equation}
+  \boxed{\;\left.\frac{\partial\bm a}{\partial\delta}\right|_{\alpha=0}=\bm0\;}
+\end{equation}
+identically, for every $\delta_0$. Geometrically: at $\alpha=0$ the normal is
+parallel to $\rhat$, and the clock angle only rotates the normal about
+itself, which does nothing.
+
+For the cone angle, using
+$\mathrm{d}(\cos^2\!\alpha\sin\alpha)/\mathrm{d}\alpha
+=\cos^3\!\alpha-2\cos\alpha\sin^2\!\alpha$ and
+$\mathrm{d}(\cos^3\!\alpha)/\mathrm{d}\alpha=-3\cos^2\!\alpha\sin\alpha$,
+\begin{equation}
+  \frac{\partial\bm a}{\partial\alpha}
+  = k\Bigl[-3\cos^2\!\alpha\sin\alpha\,\rhat
+    + \bigl(\cos^3\!\alpha-2\cos\alpha\sin^2\!\alpha\bigr)
+      \bigl(\cos\delta\,\phat+\sin\delta\,\qhat\bigr)\Bigr] .
+  \label{eq:dadalpha}
+\end{equation}
+At $\alpha=0$ this reduces to $k(\cos\delta_0\,\phat+\sin\delta_0\,\qhat)$: a
+single, purely transverse direction fixed by the constant $\delta_0$. The radial
+authority vanishes because
+$\mathrm{d}(\cos^3\!\alpha)/\mathrm{d}\alpha\to0$ as $\alpha\to0$.
+
+\subsection{Why rank of \texorpdfstring{$B$}{B} is the wrong test}
+
+A face-on sail supplies one input direction, and it is transverse. One might
+conclude the radial direction is unreachable. That is wrong, because the
+Coriolis term in \eqref{eq:inplane} couples $\xi$ and $\eta$: a transverse push
+generates radial motion within one dynamical time. The correct test is the
+Kalman rank condition on $[B,\,MB,\,M^2B,\dots,M^5B]$ for the $6\times6$ system
+matrix $M$. Applying it at the $\beta=0.05$ equilibrium ($c_2=1.409194$) gives
+rank $4/6$ at $\alpha_0=0,\delta_0=0$ --- the in-plane four-state block is fully
+controllable (rank $4/4$), and it is the \emph{out-of-plane} pair that is lost,
+because $z$ decouples at linear order and only $\partial\bm a/\partial\delta$
+could have reached it.
+
+\subsection{The optimal cone angle}
+
+The transverse thrust component is $\propto\cos^2\!\alpha\sin\alpha$. Maximising,
+\begin{equation}
+  \frac{\mathrm{d}}{\mathrm{d}\alpha}\bigl(\cos^2\!\alpha\sin\alpha\bigr)
+  = \cos\alpha\bigl(\cos^2\!\alpha-2\sin^2\!\alpha\bigr) = 0
+  \;\Longrightarrow\;
+  \tan^2\!\alpha=\tfrac12 ,
+\end{equation}
+so
+\begin{equation}
+  \alpha_0^\star=\arctan\bigl(1/\sqrt2\bigr)=35.264^\circ,
+  \qquad
+  \cos^2\!\alpha_0^\star=\frac{1}{1+\tan^2\!\alpha}=\frac23 .
+\end{equation}
+This is McInnes' classical optimal sail cone angle; recovering it from the
+control Jacobian is a benchmark, not a new result.
+
+What is new is the conditioning there. At $\alpha_0^\star$,
+$\cos^2\!\alpha-2\sin^2\!\alpha=\tfrac23-\tfrac23=0$, so the transverse part of
+\eqref{eq:dadalpha} vanishes and
+\begin{equation}
+  \frac{\partial\bm a}{\partial\alpha}
+  = -3k\cos^2\!\alpha\sin\alpha\,\rhat
+  = -3k\cdot\tfrac23\cdot\tfrac{1}{\sqrt3}\,\rhat
+  = -\frac{2k}{\sqrt3}\,\rhat ,
+\end{equation}
+purely radial, while from \eqref{eq:dadelta}
+\begin{equation}
+  \left\lVert\frac{\partial\bm a}{\partial\delta}\right\rVert
+  = k\cos^2\!\alpha\sin\alpha = k\cdot\tfrac23\cdot\tfrac1{\sqrt3}
+  = \frac{2k}{3\sqrt3} .
+\end{equation}
+The two columns are orthogonal, so they \emph{are} the singular vectors, and
+\begin{equation}
+  \frac{\sigma_2}{\sigma_1}
+  = \frac{2k/(3\sqrt3)}{2k/\sqrt3} = \frac13
+\end{equation}
+exactly, independent of $\beta$ and $\mu$.
+
+% =====================================================================
+\section{Every residual, explained}\label{sec:resid}
+% =====================================================================
+
+This section exists because a reader meeting ``\num{2.1e-16}'' in an abstract
+cannot tell whether it is a physical result, a convergence tolerance, or noise.
+Each of the manuscript's small numbers is a different kind of quantity.
+
+\subsection{Floating-point background}
+
+All computation is IEEE-754 double precision. The machine epsilon is
+$\varepsilon=2^{-52}=\num{2.220446e-16}$: the gap between $1$ and the next
+representable number. For a value $x$, the gap to its neighbour --- one
+\emph{unit in the last place}, or ulp --- is approximately $x\varepsilon$. A
+disagreement of a few ulp between two computations of the same quantity means
+they agree as well as double precision permits, and says nothing about the
+mathematics.
+
+\subsection{Table 2: the closed form against root-finding}
+
+The column $\lvert\Delta\rvert$ is $\lvert\beta_{\mathrm{closed}} -
+\beta_{\mathrm{brentq}}\rvert$, where the first evaluates
+\eqref{eq:closedform} directly and the second solves $s(\beta)-1=0$ by Brent's
+method through the numerically computed equilibrium. The two share no code path
+beyond the balance itself, so agreement exercises the whole chain.
+
+\begin{table}[t]
+  \centering
+  \caption{The Table-2 residuals expressed in units in the last place. All four
+  are at the level of the root-finder's convergence, not of a disagreement in
+  the mathematics.}
+  \label{tab:ulp}
+  \begin{tabular}{lcccc}
+    \toprule
+    system & $\beta_{\mathrm{crit}}$ & $\lvert\Delta\rvert$ &
+    $\mathrm{ulp}(\beta)$ & $\lvert\Delta\rvert$ in ulp \\
+    \midrule
+    Sun--Mercury & \num{0.010961525} & \num{3.1e-16} & \num{1.7e-18} & \num{179} \\
+    Sun--Earth   & \num{0.028646456} & \num{2.1e-16} & \num{3.5e-18} & \num{60} \\
+    Sun--Jupiter & \num{0.187186696} & \num{2.8e-16} & \num{2.8e-17} & \num{10} \\
+    Earth--Moon  & \num{0.406934946} & \num{5.0e-16} & \num{5.6e-17} & \num{9} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:ulp} shows the pattern: the residual is roughly constant in
+absolute terms ($\sim\num{3e-16}$) rather than in relative terms, so it grows in
+ulp as $\beta$ shrinks. That is the signature of an \emph{absolute} convergence
+tolerance in the root-finder, which is exactly what \texttt{brentq} is
+configured with. Nothing here is physics.
+
+\subsection{The 61-point sweep}
+
+The manuscript states that over $\mu\in[10^{-7},10^{-2}]$ sampled at 61
+logarithmically spaced points, the two computations never differ by more than
+\num{1.9e-15}. The worst case occurs at $\mu=\num{2.1544e-4}$, where
+$\beta=0.116303$ and the residual is \num{1.8874e-15}, or $136$ ulp. The
+Sun--Earth value \num{2.1e-16} quoted separately is that one system's residual
+and is \emph{not} the sweep maximum --- an earlier draft conflated the two.
+
+\subsection{The frequency scan}\label{sec:scanresid}
+
+The manuscript reports that a $4\times10^5$-point scan places the minimum of
+$\nu/\omega$ at $c_2=1.60000000$ with value $0.942809041582$, ``agreeing with
+\eqref{eq:cstar} and \eqref{eq:bound} to \num{8.1e-10} and \num{1.1e-16}
+respectively''. These two numbers mean very different things and the first is
+misleading.
+
+The scan is \texttt{linspace(1+1e-9, 4.2, 400001)}, a uniform grid of step
+\begin{equation}
+  h = \frac{4.2-(1+10^{-9})}{400000} = \num{8.0e-6} .
+\end{equation}
+A grid search can locate a minimum no better than about $h/2=\num{4e-6}$ in
+general. The reported \num{8.125e-10} is the distance from $8/5$ to the
+\emph{nearest grid point}, which happens to be small because of how the offset
+$10^{-9}$ and the step interact --- an arithmetic accident of this particular
+\texttt{linspace}, not a measure of resolving power. Had the grid been offset
+differently, that figure would have been up to $\num{4e-6}$.
+
+The second number is meaningful. At a stationary point the function is
+quadratically flat, so a location error $\epsilon$ produces a value error
+$\sim\tfrac12R''\epsilon^2$. With $\epsilon\sim10^{-9}$ the value error is far
+below $\varepsilon$, which is why the \emph{value} agrees to \num{1.1e-16}
+--- one ulp --- while the \emph{location} does not. The honest summary is:
+the scan confirms the value of the bound to machine precision and is consistent
+with the location $c_2=8/5$ to within its grid resolution of $\num{4e-6}$.
+
+\subsection{The Jacobi spreads}\label{sec:jacobiresid}
+
+``Spread'' means $\max-\min$ of the quantity sampled along one full period of a
+closed orbit. On the first atlas member ($\beta=0.001$, $A_z=\num{5.0415e-4}$):
+\begin{itemize}
+\item $C_{\mathrm{sail}}$ spread $\approx\num{1.8e-15}$ --- this is
+      \emph{integrator noise}. $C_{\mathrm{sail}}$ is an exact invariant, so its
+      variation measures only the accumulated truncation and rounding error of
+      the ODE solver. It is tolerance-dependent: re-integrating at
+      \texttt{rtol=atol=1e-13} gives \num{1.33e-15} instead. Any value at the
+      $10^{-15}$ level means ``conserved to machine precision''.
+\item $C_{\mathrm{grav}}$ spread $=\num{5.787e-6}$ --- this is \emph{physical}.
+      By \eqref{eq:cgrav} the two differ by $2\beta(1-\mu)/r_1$, which varies as
+      $r_1$ varies along the orbit. It is nine orders of magnitude larger and is
+      not a numerical artefact. It is the reason the sail potential, not the
+      gravitational one, must be used.
+\end{itemize}
+Note that over an exactly closed orbit $r_1$ returns to its initial value, so
+$C_{\mathrm{grav}}$ returns to its initial value too: the failure mode is not a
+secular drift but a dependence on \emph{where} on the orbit the constant is
+sampled. Sampling always at the same crossing makes the wrong quantity look
+smooth, which is what concealed the error rather than exposing it.
+
+\subsection{Other small numbers}
+
+\begin{description}
+\item[\num{3.07e-5}, the $L_3$ miss.] At $\mu=\tfrac12$ the classical $L_3$
+reaches $c_2=1.569787$, giving $\nu/\omega$ larger than the bound
+\eqref{eq:bound} by \num{3.07e-5}. This is a genuine dynamical near-miss, not a
+numerical residual: $L_3$ occupies precisely the interval in which the extremum
+$c_2^\star=8/5$ lies, and falls just short of reaching it.
+
+\item[$<10^{-13}$, the $A\equiv c_2$ identity.] Two algebraically identical
+expressions evaluated by different code paths. The residual is accumulated
+rounding over a handful of operations on numbers of order unity.
+
+\item[\num{4.5e-4} and \num{5.2e-2}, the singular values.] These are physical:
+the second and first singular values of the transverse block of
+$B_{\mathrm{sail}}$ at $\alpha_0=0.5^\circ$, in nd acceleration units. Their
+ratio, $115{:}1$, is the conditioning penalty for operating near the singular
+nominal. It is not a tolerance.
+
+\item[$\Delta_z$, the branch discriminant.]\label{sec:deltaz} Defined as
+$(\lvert z_0\rvert-\lvert z(T/2)\rvert)/(\lvert z_0\rvert+\lvert z(T/2)\rvert)$,
+this is a dimensionless asymmetry, identically zero on the vertical-Lyapunov
+branch and $O(0.1)$ on a genuine halo. From \texttt{halo\_atlas.csv} the
+smallest value in each family falls from $0.109$ at $\beta=0.001$ to $0.0898$
+at $\beta=0.040$ and $0.0125$ at $\beta=0.050$. It remains a valid
+discriminator across the band --- the competing branch sits at zero --- but at
+the upper end it separates the two by one order of magnitude rather than two.
+\end{description}
+
+% =====================================================================
+\section{Physical scales for Sun--Earth}\label{sec:scales}
+% =====================================================================
+
+\begin{table}[h]
+  \centering
+  \caption{Conversions used throughout, $\mu=\num{3.003e-6}$.}
+  \begin{tabular}{ll}
+    \toprule
+    quantity & value \\
+    \midrule
+    1 nd length              & \SI{1.495978707e8}{\kilo\metre} \\
+    1 nd time                & \SI{58.1324}{\day} \\
+    one full revolution      & $2\pi$ nd $=$ \SI{365.25636}{\day} \\
+    Hill radius $r_H$        & \num{0.0100033} nd $=$ \SI{1496477}{\kilo\metre} \\
+    classical $L_1$ standoff & \num{0.0099699} nd $=$ \SI{1491472}{\kilo\metre} \\
+    parity standoff          & \num{0.0144273} nd $=$ \SI{2158294}{\kilo\metre} \\
+    critical sail loading $\sigma^\ast$ & \SI{1.5311}{\gram\per\metre\squared} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Reproducing every number}\label{sec:repro}
+% =====================================================================
+
+The repository is public at
+\url{https://github.com/Bishwaswarup/SOLAR_SAIL}. From a clean clone:
+\begin{verbatim}
+  pip install -r requirements.txt
+  python main.py verify     # regression suite + 175 manuscript checks
+  python main.py results    # regenerates results.txt
+  python main.py atlas      # re-walks the 12 halo families (slow)
+  python main.py figures    # regenerates the paper figures
+\end{verbatim}
+\texttt{paper/verify\_numbers.py} is the authority on manuscript agreement. It
+recomputes each claim from the \texttt{src/} modules and compares it against the
+literal typed in \texttt{main.tex}; Tables 2, 3 and 4 are parsed cell by cell
+out of the manuscript source, so a table cannot silently disagree with the
+formula it tabulates. A drifted number fails there rather than in review.
+
+\end{document}

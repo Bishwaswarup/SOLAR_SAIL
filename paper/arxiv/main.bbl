@@ -1,4 +1,4 @@
-\begin{thebibliography}{15}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -70,6 +70,13 @@ Gerard G{\'o}mez, Josep~J. Masdemont, and Josep~M. Mondelo.
 \newblock The dynamics around the collinear equilibrium points of the {RTBP}.
 \newblock \emph{Physica D}, 157\penalty0 (4):\penalty0 283--321, 2001.
 \newblock \doi{10.1016/S0167-2789(01)00312-8}.
+
+\bibitem[Celletti et~al.(2024)Celletti, Lhotka, and Pucacco]{celletti2024}
+Alessandra Celletti, Christoph Lhotka, and Giuseppe Pucacco.
+\newblock The dynamics around the collinear points of the elliptic three-body
+  problem: A normal form approach.
+\newblock \emph{Physica D: Nonlinear Phenomena}, 468:\penalty0 134302, 2024.
+\newblock \doi{10.1016/j.physd.2024.134302}.
 
 \bibitem[Mori et~al.(2010)Mori, Sawada, Funase, et~al.]{mori2010}
 Osamu Mori, Hirotaka Sawada, Ryu Funase, et~al.

@@ -13,6 +13,7 @@ import re
 import sys
 
 import numpy as np
+from scipy.optimize import brentq
 
 sys.path.insert(0, '.')
 
@@ -270,10 +271,99 @@ else:
     checks.append(('Sec 4: sweep bound sentence found in main.tex', 0.0, 1.0, False))
     failures.append('Sec 4 sweep-bound sentence not found -- did the wording change?')
 
+# ── Sec 4.3: the tidal-strength hierarchy s = kappa (tab:hierarchy) ─────────
+# beta(kappa) is checked against an INDEPENDENT brentq solve of s(beta) = kappa,
+# exactly as beta_crit is checked against root-finding in Table 2.  Every row of
+# tab:hierarchy is parsed out of main.tex so the table cannot drift from the
+# formula it claims to tabulate.
+AU_KM_ = 1.495978707e8
+YEAR_D = 365.25636
+TU_D   = YEAR_D / (2 * np.pi)          # one nd time unit, in days
+
+
+def beta_of_kappa(kappa, mu=MU_SE):
+    """Impose s = mu/r2^3 = kappa on the on-axis balance, eq. (betakappa).
+       r1 = 1 - r2 is exact on the segment, so no expansion is involved."""
+    r2 = (mu / kappa) ** (1 / 3)
+    return 1.0 - (1 - r2) ** 2 * ((1 - mu) - r2 + mu / r2 ** 2) / (1 - mu)
+
+
+# the algebraic claim the section rests on: the residue vanishes iff kappa = 1
+for _k in (0.1, 0.5, 2.0, 3.0):
+    _r2 = (MU_SE / _k) ** (1 / 3)
+    chk(f'hierarchy: residue Delta(kappa={_k}) matches mu^(1/3) k^(-1/3)(k-1)',
+        -_r2 + MU_SE / _r2 ** 2,
+        MU_SE ** (1 / 3) * _k ** (-1 / 3) * (_k - 1), tol=1e-15)
+chk('hierarchy: residue vanishes at kappa = 1',
+    -(MU_SE ** (1 / 3)) + MU_SE / (MU_SE ** (1 / 3)) ** 2, 0.0, tol=1e-16)
+chk('hierarchy: kappa=1 reproduces the pure square of eq. (closed)',
+    beta_of_kappa(1.0), critical_beta_tidal_exact(MU_SE), tol=1e-14)
+chk('hierarchy: kappa=3 is exactly the Hill-sphere exit beta',
+    beta_of_kappa(3.0), critical_beta_hill(MU_SE), tol=1e-12)
+chk('hierarchy: classical L1 sits at kappa = s(beta=0)',
+    beta_of_kappa(saddle_strength(0.0, MU_SE)), 0.0, tol=1e-12)
+
+_hier_re = re.compile(
+    r'^\s*\\num\{([0-9.]+)\}\s*&\s*\\num\{([0-9.]+)\}\s*&\s*\\num\{([0-9.]+)\}'
+    r'\s*&\s*\\num\{([0-9.]+)\}\s*&\s*\\num\{([0-9]+)\}\s*&\s*\\num\{([0-9.]+)\}'
+    r'\s*\\\\', re.M)
+_hrows = _hier_re.findall(tex)
+chk('tab:hierarchy: rows parsed from main.tex', len(_hrows), 7, tol=0)
+for _ks, _bs, _r2s, _rrs, _kms, _taus in _hrows:
+    _k = float(_ks)
+    chk(f'tab:hierarchy k={_ks}: beta vs closed form', beta_of_kappa(_k),
+        float(_bs), tol=5e-7)
+    chk(f'tab:hierarchy k={_ks}: beta vs independent root-find',
+        brentq(lambda b: saddle_strength(b, MU_SE) - _k, 1e-12, 0.95,
+               xtol=1e-14) if _k < saddle_strength(0.0, MU_SE) else 0.0,
+        float(_bs), tol=5e-7)
+    chk(f'tab:hierarchy k={_ks}: r2 = (mu/kappa)^(1/3)',
+        (MU_SE / _k) ** (1 / 3), float(_r2s), tol=5e-7)
+    chk(f'tab:hierarchy k={_ks}: r2/r_H = (3/kappa)^(1/3)',
+        (3 / _k) ** (1 / 3), float(_rrs), tol=5e-5)
+    chk(f'tab:hierarchy k={_ks}: standoff [km]',
+        (MU_SE / _k) ** (1 / 3) * AU_KM_, float(_kms), tol=1.0)
+    chk(f'tab:hierarchy k={_ks}: tau_u [d]',
+        TU_D / linear_modes(float(_bs), MU_SE)['lam_u'], float(_taus), tol=0.1)
+
+# ── Sec 4.4: the operational e-fold horizons (tab:efold) ────────────────────
+chk('operational: tau_u at beta=0 is the classical L1 e-folding time [d]',
+    TU_D / linear_modes(0.0, MU_SE)['lam_u'], 22.95, tol=0.01)
+chk('operational: one nd time unit [d]', TU_D, 58.1324, tol=1e-3)
+
+_efold_re = re.compile(
+    r'&\s*\\num\{(\d+)\}\s*&\s*\\num\{([0-9.]+)\}\s*&\s*\\num\{([0-9.]+)\}'
+    r'\s*&\s*\\num\{([0-9.]+)\}\s*\\\\', re.M)
+_erows = _efold_re.findall(tex)
+chk('tab:efold: rows parsed from main.tex', len(_erows), 5, tol=0)
+for _Ts, _lams, _bs, _ss in _erows:
+    _T = float(_Ts)
+    chk(f'tab:efold T={_Ts}d: lambda_u* = 1/(T/TU)', TU_D / _T, float(_lams),
+        tol=5e-5)
+    _b = brentq(lambda x: linear_modes(x, MU_SE)['lam_u'] - TU_D / _T,
+                1e-6, 0.95, xtol=1e-12)
+    chk(f'tab:efold T={_Ts}d: beta giving exactly one e-fold', _b, float(_bs),
+        tol=5e-6)
+    chk(f'tab:efold T={_Ts}d: s at that beta', saddle_strength(_b, MU_SE),
+        float(_ss), tol=5e-4)
+
+# ── Sec 5.2: the exact denominator bound on commensurabilities ──────────────
+# The paper claims no rational p/q with q <= 17 lies in [2 sqrt2/3, 1), and that
+# 17:18 is the lowest-order one that does.  Both are checked by brute force.
+_lo = NU_OMEGA_MIN
+_inside = [(p, q) for q in range(1, 40) for p in range(1, q) if _lo <= p / q < 1]
+_first = min(_inside, key=lambda pq: pq[1])
+chk('Sec 5.2: lowest denominator inside the band', _first[1], 18, tol=0)
+chk('Sec 5.2: lowest-order commensurability is 17:18', _first[0], 17, tol=0)
+chk('Sec 5.2: no rational with q <= 17 lies in the band',
+    sum(1 for p, q in _inside if q <= 17), 0, tol=0)
+chk('Sec 5.2: the 1/(1-2sqrt2/3) threshold', 1 / (1 - _lo), 17.4853, tol=1e-3)
+
 # ── cross-check: do these literals actually appear in main.tex? ─────────────
 literals = ['0.028646456169', '7:8:9', '0.480187660',
             '35.264', '1.569787', '0.00613', '4.060819', '2.014635',
-            '1.505418', '0.040932',
+            '1.505418', '0.040932', '17{:}18', '0.015441', '0.127015',
+            '22.95', '58.1324', 'celletti2024',
             'c_2', 'ceccaroni2016', 'richardson1980', 'gomez2001',
             'almost equal values of the frequencies']
 missing = [t for t in literals if t.replace('\\\\', '\\') not in tex

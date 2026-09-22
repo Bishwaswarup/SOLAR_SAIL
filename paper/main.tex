@@ -75,16 +75,23 @@ coefficient of the collinear expansion --- the quantity a sail detunes
 continuously, and which is otherwise fixed by the mass ratio and the choice of
 point --- the ratio of the out-of-plane to in-plane linear frequencies at any
 collinear equilibrium is confined to $\nu/\omega\in[2\sqrt2/3,\,1)$, a band
-\SI{5.72}{\percent} wide containing no low-order rational. The bound is attained
+\SI{5.72}{\percent} wide which we show contains no commensurability of
+denominator below $18$. The bound is attained
 exactly at $c_2=8/5$, where the three linear rates stand in the ratio
 $\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both $c_2=8/5$ and the bound are independent
 of $\mu$. That the two frequencies are nearly equal at collinear points has been
 remarked upon~\cite{ceccaroni2016}; we make the statement exact. We emphasise that neither result is a bifurcation: the saddle persists
 for all $\beta$ and the degeneration is smooth, so these are exact structural
-landmarks rather than dynamical transitions, and we show by explicit search that
-no commensurability exists anywhere to make one. Reducing $\beta$ from primary
-mission specifications, we find that no solar sail yet flown exceeds
-$\beta=0.00613$, placing tidal parity a factor of $4.7$ beyond demonstrated
+landmarks rather than dynamical transitions, and the lowest-order
+commensurability the band admits at all is $17{:}18$, of order $35$. We further
+show that tidal parity is not an arbitrary level: generalising the condition to
+$s=\kappa$ yields a closed form for every $\kappa$, and $\kappa=1$ is the unique
+level at which the smaller primary drops out of the on-axis balance identically.
+Read operationally through the instability e-folding time, parity corresponds to
+\SI{38.6}{\day} at Sun--Earth, between the \SI{30}{\day} and \SI{90}{\day}
+mission horizons. Reducing $\beta$ from primary
+mission specifications, we find that no solar sail yet flown reaches
+$\beta=0.0062$, placing tidal parity a factor of $4.7$ beyond demonstrated
 capability. Finally, linearising the sail acceleration in its two attitude
 angles shows that the face-on nominal is a \emph{singular} configuration for
 station-keeping: $\partial\bm{a}/\partial\delta$ vanishes identically at
@@ -130,7 +137,10 @@ Section~\ref{sec:model} sets out the model and the conservative rescaling.
 Section~\ref{sec:dissolution} defines the saddle strength $s=\mu/r_2^3$ and
 measures its four-decade collapse. Section~\ref{sec:closed} derives the exact
 tidal-parity threshold, the paper's principal result, and validates it across
-five decades of mass ratio. Section~\ref{sec:freq} establishes the frequency
+five decades of mass ratio; Section~\ref{sec:hierarchy} embeds it in a
+one-parameter hierarchy of tidal-strength levels and shows which property
+distinguishes it, and Section~\ref{sec:operational} reads it through the
+instability timescale a mission would actually feel. Section~\ref{sec:freq} establishes the frequency
 bound $\nu/\omega\in[2\sqrt2/3,1)$, locates its exact extremum at $c_2=8/5$, and
 reports a systematic negative: no low-order resonance is attainable anywhere,
 which is what forbids interpreting either threshold as a bifurcation.
@@ -202,8 +212,9 @@ a non-orthonormal triad, since $\rhat\cdot\hat{\bm{k}}=z/r_1\neq0$ off the
 ecliptic, and then
 $\lVert\nhat\rVert^{2}=1+\sin(2\alpha)\sin\delta\,(z/r_1)$, so that the nominal
 unit normal is not a unit vector and both the magnitude and the direction of the
-force are wrong. The error is \SI{1.0}{\percent} at $z/r_1=0.02$ and
-\SI{4.4}{\percent} at $z/r_1=0.09$. It vanishes identically at $\alpha=0$, so no
+force are wrong. Since $\lVert\nhat\rVert^2-1$ is maximised at
+$\sin(2\alpha)\sin\delta=1$, the worst-case error in $\lVert\nhat\rVert$ is
+\SI{1.0}{\percent} at $z/r_1=0.02$ and \SI{4.4}{\percent} at $z/r_1=0.09$. It vanishes identically at $\alpha=0$, so no
 face-on result in this paper is affected; we record it because off-axis
 quantities computed on the shortcut triad are not reliable.
 Figure~\ref{fig:schematic} shows the geometry.
@@ -454,6 +465,7 @@ itself.
   $s(\beta)=1$. Agreement is at machine precision for every mass ratio tested.
   $r_2/r_H=3^{1/3}=1.4422$ at parity by construction, independent of $\mu$.}
   \label{tab:closed}
+  \small
   \begin{tabular}{lccccc}
     \toprule
     system & $\mu$ &
@@ -474,6 +486,130 @@ $r_2=\num{0.014427}\,\nd=\SI{2158294}{\kilo\metre}=1.4422\,r_H$. For reference,
 the classical $L_1$ already sits at $r_2=0.9967\,r_H$, essentially on the Hill
 sphere, so the Hill-sphere exit criterion $r_2=r_H$ is reached almost
 immediately, at $\beta=\num{2.9814e-4}$, and is not a useful discriminant.
+
+\subsection{Parity is one level of a hierarchy, and the distinguished one}
+\label{sec:hierarchy}
+
+The level $s=1$ is a choice, and a reader is entitled to ask what privileges it.
+We answer by generalising. Impose instead $s=\kappa$ for arbitrary $\kappa>0$,
+so that
+\begin{equation}
+  r_2(\kappa) = \Bigl(\frac{\mu}{\kappa}\Bigr)^{1/3}
+              = \Bigl(\frac{3}{\kappa}\Bigr)^{1/3} r_H ,
+  \label{eq:r2kappa}
+\end{equation}
+and repeat the substitution of Section~\ref{sec:closed}. Because $r_1+r_2=1$ is
+exact, $r_1=1-r_2(\kappa)$ with no error term, and the balance~\eqref{eq:balance}
+gives a closed form for every $\kappa$,
+\begin{equation}
+  \beta(\kappa) = 1 - \frac{\bigl(1-r_2\bigr)^{2}}{1-\mu}
+                  \Bigl[(1-\mu) + \underbrace{\mu^{1/3}\kappa^{-1/3}(\kappa-1)}
+                  _{\textstyle \Delta(\kappa)}\Bigr] .
+  \label{eq:betakappa}
+\end{equation}
+The bracketed correction $\Delta(\kappa)=-r_2+\mu/r_2^{2}$ is the residue of the
+smaller primary's direct term after the standoff has been subtracted, and
+\begin{equation}
+  \Delta(\kappa)=0 \qquad\Longleftrightarrow\qquad \kappa=1 .
+  \label{eq:deltazero}
+\end{equation}
+By~\eqref{eq:deltazero}, at $\kappa=1$ and only there
+$\mu/r_2^{2}=\mu^{1/3}=r_2$ identically: the
+tidal acceleration and the standoff cancel in the balance, \eqref{eq:betakappa}
+collapses to $1-\beta=r_1^{2}$, and the threshold reduces to the pure square
+\eqref{eq:closed}. Every other level leaves an explicit $\kappa$-dependent
+residue. \emph{Tidal parity is therefore the unique level at which the smaller
+primary drops out of the on-axis balance identically}, which is a structural
+property of the balance rather than a preference about units --- the objection
+we raised against ourselves at the start of Section~\ref{sec:freq}.
+
+Table~\ref{tab:hierarchy} evaluates~\eqref{eq:betakappa} across the hierarchy,
+and shows that the two levels this paper has already used are members of it.
+The classical $L_1$ is $\kappa=3.0303$; the Hill-sphere exit criterion
+dismissed above is exactly $\kappa=3$, since $s=3\Leftrightarrow r_2=r_H$ by
+\eqref{eq:r2kappa}. What looked like two unrelated markers --- one useful, one
+not --- is one family sampled at two levels, with parity the distinguished
+member between them and the sail sweeping continuously through all of them.
+
+\begin{table}[t]
+  \centering
+  \caption{The tidal-strength hierarchy $s=\kappa$ for Sun--Earth, evaluated
+  from the closed form~\eqref{eq:betakappa}. $r_2/r_H=(3/\kappa)^{1/3}$ exactly,
+  independent of $\mu$. The last column is the e-folding
+  time~\eqref{eq:tau} of the residual saddle. Both markers used earlier in this
+  paper appear as members: $\kappa=3.0303$ is the classical $L_1$ and
+  $\kappa=3$ is the Hill-sphere exit.}
+  \label{tab:hierarchy}
+  \begin{tabular}{lccccl}
+    \toprule
+    $\kappa$ & $\beta$ & $r_2$ [nd] & $r_2/r_H$ &
+    standoff [\si{\kilo\metre}] & $\tau_u$ [d] \\
+    \midrule
+    \num{3.0303} & \num{0.000000} & \num{0.009970} & \num{0.9967} & \num{1491472} & \num{23.0} \\
+    \num{3}      & \num{0.000298} & \num{0.010003} & \num{1.0000} & \num{1496477} & \num{23.1} \\
+    \num{2}      & \num{0.011581} & \num{0.011451} & \num{1.1447} & \num{1713039} & \num{28.0} \\
+    \num{1}      & \num{0.028646} & \num{0.014427} & \num{1.4422} & \num{2158294} & \num{38.6} \\
+    \num{0.5}    & \num{0.044785} & \num{0.018177} & \num{1.8171} & \num{2719280} & \num{52.9} \\
+    \num{0.1}    & \num{0.087462} & \num{0.031083} & \num{3.1072} & \num{4649903} & \num{109.7} \\
+    \num{0.01}   & \num{0.187161} & \num{0.066966} & \num{6.6943} & \num{10017911}& \num{326.5} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{An operational reading: what the saddle does to a mission}
+\label{sec:operational}
+
+A level crossing says nothing by itself about whether a spacecraft notices.
+The quantity that does is the e-folding time of the residual instability,
+\begin{equation}
+  \tau_u = \frac{1}{\lambda_u}, \qquad
+  N_{\mathrm{efold}} = \lambda_u T_{\mathrm{mission}} ,
+  \label{eq:tau}
+\end{equation}
+with $\lambda_u$ from~\eqref{eq:rates} and time in units of $1/n$, one year
+divided by $2\pi$, or \SI{58.1324}{\day} for Sun--Earth. At $\beta=0$
+\eqref{eq:tau} returns $\tau_u=\SI{22.95}{\day}$, which is the familiar
+e-folding time of the Sun--Earth $L_1$ saddle; we did not fit it, and its
+recovery is a check on~\eqref{eq:rates}.
+
+Inverting $N_{\mathrm{efold}}=1$ for $\beta$ gives the lightness number at which
+the saddle can no longer produce even one e-fold of departure over a stated
+mission horizon. Table~\ref{tab:efold} reports it.
+
+\begin{table}[t]
+  \centering
+  \caption{Lightness number at which the residual saddle yields exactly one
+  e-fold of departure over the stated horizon, Sun--Earth, $\alpha=0$, obtained
+  by root-finding on $\lambda_u(\beta)T=1$. For comparison, tidal parity is
+  $\beta=\num{0.028646}$ with $\tau_u=\SI{38.6}{\day}$.}
+  \label{tab:efold}
+  \begin{tabular}{lcccc}
+    \toprule
+    horizon & $T$ [d] & $\lambda_u^{\star}$ [nd] & $\beta$ & $s$ \\
+    \midrule
+    \SI{30}{\day}  & \num{30}  & \num{1.93775} & \num{0.015441} & \num{1.7223} \\
+    \SI{90}{\day}  & \num{90}  & \num{0.64592} & \num{0.074652} & \num{0.1541} \\
+    6 months       & \num{183} & \num{0.31766} & \num{0.127015} & \num{0.0335} \\
+    1 year         & \num{365} & \num{0.15927} & \num{0.201200} & \num{0.0079} \\
+    2 years        & \num{731} & \num{0.07952} & \num{0.311638} & \num{0.0019} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Two things follow, and they pull in opposite directions. Tidal parity sits
+between the \SI{30}{\day} and \SI{90}{\day} horizons: at $\beta_{\mathrm{crit}}$
+the saddle still turns over in \SI{38.6}{\day}, so a spacecraft there is very
+far from free of it. Operational irrelevance over a realistic mission is a much
+stronger demand --- $\beta=0.127$ for six months, $\beta=0.201$ for a year ---
+which is a factor of $20$ to $33$ beyond the best sail yet flown
+(Section~\ref{sec:tech}). The exact threshold and the operational one answer
+different questions and should not be conflated: \eqref{eq:closed} locates where
+the smaller primary stops dominating the Hessian, while
+Table~\ref{tab:efold} locates where it stops mattering to a mission. The first
+is exact and $\mu$-independent in form; the second is a numerical root of a
+transcendental function and depends on the horizon one chooses. We report both
+because the first is the sharper statement and the second is the more useful
+one.
 
 % =====================================================================
 \section{The frequency ratio: a universal bound on \texorpdfstring{$c_2$}{c2}}\label{sec:freq}
@@ -539,6 +675,17 @@ full range $\mu\in(0,\tfrac12]$, note that the centre-manifold dynamics is
 ratios''. Equations~\eqref{eq:band} and~\eqref{eq:bound} make that observation
 exact and supply the constant it is missing.
 
+The observation is not merely descriptive: it is load-bearing. Celletti, Lhotka
+and Pucacco~\cite{celletti2024} build their normal form for the collinear points
+of the elliptic problem on exactly this near-equality, assuming the two elliptic
+frequencies equal and displacing their difference into a first-order term
+through a detuning parameter $\delta\equiv\omega_y-\omega_z$. Read in that
+setting, \eqref{eq:band} bounds the detuning: $\delta>0$ strictly for $c_2>1$,
+so the $1{:}1$ resonance is never exactly attained, and the relative detuning
+$1-\nu/\omega$ can never exceed \SI{5.72}{\percent} at any collinear point of
+any three-body system. The near-equality such schemes rely on is therefore a
+structural property with an explicit bound, not an empirical convenience.
+
 \subsection{No low-order resonance is attainable}
 
 We tested fourteen low-order rationals --- $1{:}2$, $2{:}3$, $3{:}4$, $4{:}5$,
@@ -548,12 +695,34 @@ it. Since $\nu<\omega$ strictly for $c_2>1$, even the $1{:}1$ commensurability i
 approached only asymptotically, as the equilibrium degenerates into the hovering
 point.
 
-The consequence is that no commensurability underwrites tidal parity, and none
-exists elsewhere in the face-on solar-sail CR3BP either. Equation
+A spot check of fourteen rationals is weaker than the band deserves, because
+\eqref{eq:band} admits an exact statement. The band is a left-closed interval
+with right endpoint $1$, so the only rationals it can contain with denominator
+$q$ are those nearest unity, and the largest rational below unity at
+denominator $q$ is $(q-1)/q$. Hence a commensurability $p{:}q$ lies
+in~\eqref{eq:band} only if
+\begin{equation}
+  \frac{q-1}{q} \;\geq\; \frac{2\sqrt2}{3}
+  \qquad\Longleftrightarrow\qquad
+  q \;\geq\; \frac{1}{1-2\sqrt2/3} = 17.485\ldots ,
+  \label{eq:qbound}
+\end{equation}
+that is, only if $q\geq18$. \emph{The band therefore contains no commensurability
+of denominator below $18$ at all}, and the lowest-order one inside it is
+$17{:}18=0.9444\ldots$, of order $p+q=35$. The fourteen rationals above have
+denominators at most $9$ and are excluded by~\eqref{eq:qbound} without needing
+to be tested individually.
+
+The consequence is that no commensurability of any order a perturbation theory
+would ordinarily retain underwrites tidal parity, or arises anywhere else in the
+face-on solar-sail CR3BP. Equation
 \eqref{eq:closed} must therefore be presented as an exact \emph{scale marker}
 with a clean geometric reading, not as a dynamical transition. We regard this
 negative as a result rather than an omission: it is the check a reader is
-entitled to demand, and it forecloses an over-claim.
+entitled to demand, and it forecloses an over-claim. We stress that the band is
+not resonance-free in the strict sense --- \eqref{eq:qbound} shows it is dense
+with rationals of denominator $18$ and above --- only that every one of them is
+of order $35$ or higher.
 
 Two caveats. First, \eqref{eq:band} constrains the \emph{linear} frequencies
 only. Halo families bifurcate from planar Lyapunov families at a
@@ -643,10 +812,21 @@ two guards verify the result --- the sign of the $z$-extremum asymmetry
                   {\lvert z_0\rvert + \lvert z(T/2)\rvert}
 \end{equation}
 must match the reference $\beta$, and the family must lie sunward of the
-equilibrium. $\Delta_z$ is $O(0.1)$ for a genuine halo and vanishes identically
-on the vertical-Lyapunov branch, which makes it an effective discriminator.
-Without the cross-$\beta$ guard one of the twelve families lands on a different
-branch.
+equilibrium. $\Delta_z$ is $O(0.1)$ for a genuine halo over most of the band and
+vanishes identically on the vertical-Lyapunov branch, which makes it an
+effective discriminator. It does weaken as the band is traversed: the smallest
+$\lvert\Delta_z\rvert$ in the family falls from $0.109$ at $\beta=0.001$ to
+$0.0898$ at $\beta=0.040$ and $0.0125$ at $\beta=0.050$, so at the upper end it
+separates the branches by an order of magnitude rather than two.
+The guard is not decorative. Re-walking $\beta=0.040$ with the cross-$\beta$
+seeding disabled --- so that the amplitude scan is restarted independently at
+that $\beta$, as an earlier version of this pipeline did --- lands on a branch
+that runs Earthward instead of sunward and is rejected by the far-field guard
+with $x_0$ reaching the smaller primary, so no family is returned at all.
+Seeded instead from its converged predecessor at $\beta=0.032$, the same
+$\beta$ yields $40$ members with $\Delta_z\in[0.090,\,0.161]$, every one of them
+sunward of the equilibrium. One of the twelve atlas curves is therefore a
+different family unless branch identity is enforced across $\beta$.
 
 Figure~\ref{fig:atlas} reports the resulting atlas. The Jacobi constant is
 computed from~\eqref{eq:jacobi}; because the potential~\eqref{eq:U} is itself
@@ -806,8 +986,9 @@ the chain.
   \end{tabular}
 \end{table}
 
-No sail flown and deployed exceeds $\beta=\num{0.00613}$, and the only measured
-value is IKAROS at $\beta=\num{0.00062}$. Against
+No sail flown and deployed reaches $\beta=\num{0.0062}$ --- the best is
+LightSail-2 at $\beta=\num{0.00613}$ --- and the only measured value is IKAROS
+at $\beta=\num{0.00062}$. Against
 $\beta_{\mathrm{crit}}=\num{0.028646}$:
 
 \begin{center}
@@ -883,7 +1064,14 @@ The tidal-parity threshold admits the closed form
 $\beta_{\mathrm{crit}}=2\mu^{1/3}-\mu^{2/3}$, exact for every mass ratio and
 verified to machine precision across five decades of $\mu$. For Sun--Earth it is
 $0.0286$, corresponding to a standoff of $3^{1/3}r_H$. The scale $\mu^{1/3}$ is
-not itself new; the exact sail parameter required to reach it is.
+not itself new; the exact sail parameter required to reach it is. Nor is the
+level $s=1$ arbitrary: the generalisation $s=\kappa$ admits a closed form for
+every $\kappa$, but only at $\kappa=1$ does the smaller primary's direct term
+cancel out of the balance identically, and both the classical $L_1$
+($\kappa=3.0303$) and the Hill-sphere exit ($\kappa=3$) are members of the same
+family. Read through the e-folding time, parity is a \SI{38.6}{\day} saddle;
+making the saddle operationally irrelevant over six months demands
+$\beta=0.127$, twenty times the best sail flown.
 
 The parameter $A$ of the collinear linearisation is exactly Richardson's
 second Legendre coefficient $c_2$, and a sail's effect is to detune it

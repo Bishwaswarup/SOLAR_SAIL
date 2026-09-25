@@ -50,7 +50,10 @@ an exact tidal-parity threshold and a universal frequency bound}
 \affil[1]{\small Indian Institute of Science, Bangalore 560012, India\\
 \texttt{bishwaswarup@iisc.ac.in}}
 
-\date{\today}
+\date{\today\\[6pt]
+\normalsize Preprint, version 1.\\[2pt]
+\small Source, data and verification suite:
+\url{https://github.com/Bishwaswarup/SOLAR_SAIL} (tag \texttt{arxiv-v1})}
 
 \begin{document}
 \maketitle
@@ -662,9 +665,14 @@ Over the whole physically admissible range $c_2>1$ the ratio is confined to
 \end{equation}
 a band \SI{5.72}{\percent} wide, approaching unity in the hovering limit
 $c_2\to1$ and again as $c_2\to\infty$. Numerically, a $4\times10^{5}$-point scan
-places the minimum at $c_2=1.60000000$ with value $0.942809041582$, agreeing
-with~\eqref{eq:Astar} and~\eqref{eq:bound} to \num{8.1e-10} and \num{1.1e-16}
-respectively. Note that $c_2^\star$, the ratios~\eqref{eq:789} and the
+over $c_2\in[1,4.2]$ returns a minimum value $0.942809041582$, agreeing
+with~\eqref{eq:bound} to \num{1.1e-16}, i.e.\ to one unit in the last place.
+The scan locates the minimiser only to its grid resolution of
+$\tfrac12\times\num{8.0e-6}$, which is consistent with $c_2^\star=8/5$ but does
+not independently confirm it to more digits than that; the value is far more
+accurate than the location because \eqref{eq:R} is stationary, and therefore
+quadratically flat, at $c_2^\star$. The exact statement rests
+on~\eqref{eq:Astar}, not on the scan. Note that $c_2^\star$, the ratios~\eqref{eq:789} and the
 bound~\eqref{eq:bound} contain no reference to $\mu$: they are properties of the
 collinear linearisation itself, shared by every three-body system.
 

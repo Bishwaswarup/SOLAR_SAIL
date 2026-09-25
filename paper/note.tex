@@ -1,0 +1,161 @@
+% =====================================================================
+%  Two-page technical note.  Extracted from the full preprint for a
+%  first approach to a specialist: the exact results only, no apparatus.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage[font=small,labelfont=bf]{caption}
+
+\hypersetup{colorlinks=true,
+  linkcolor={[rgb]{0.12,0.22,0.45}}, citecolor={[rgb]{0.10,0.36,0.26}},
+  urlcolor={[rgb]{0.40,0.16,0.36}},
+  pdftitle={An exact tidal-parity threshold in the face-on solar-sail CR3BP},
+  pdfauthor={Bishwaswarup Nayak}}
+
+\sisetup{group-minimum-digits=4, detect-all}
+\pagestyle{empty}
+\setlength{\parskip}{2pt}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries An exact tidal-parity threshold in the face-on solar-sail CR3BP}\\[2pt]
+{\small Technical note --- Bishwaswarup Nayak, Indian Institute of Science, Bengaluru\\
+\texttt{bishwaswarup@iisc.ac.in} \quad\textbullet\quad \today}
+\end{center}
+\vspace{-4pt}
+\hrule
+\vspace{6pt}
+
+\noindent\textbf{Setting.} A face-on sail ($\alpha=0$) exerts a purely radial,
+inverse-square force, so it is conservative and rescales solar gravity:
+$(1-\mu)\to(1-\beta)(1-\mu)$. The problem is then a photogravitational CR3BP,
+with pseudo-potential
+$U=\tfrac12(x^2+y^2)+(1-\beta)(1-\mu)/r_1+\mu/r_2$.
+On the segment between the primaries $r_1+r_2=1$ \emph{identically}, which is
+what makes everything below exact rather than asymptotic.
+
+\medskip
+\noindent\textbf{1. A closed form for the tidal-parity threshold.}
+Write the smaller primary's direct contribution to the collinear
+linearisation as the saddle strength $s=\mu/r_2^3$, and define tidal parity by
+$s=1$, i.e.\ $r_2=\mu^{1/3}=3^{1/3}r_H$. At that radius the tidal acceleration
+equals the standoff, $\mu/r_2^2=\mu^{1/3}=r_2$. Imposing this on the on-axis
+balance $x=(1-\beta)(1-\mu)/r_1^2-\mu/r_2^2$, with $r_1=1-\mu^{1/3}$ exact, the
+$\mu^{1/3}$ terms cancel and
+\begin{equation}
+  \boxed{\;\beta_{\mathrm{crit}}=1-\bigl(1-\mu^{1/3}\bigr)^2=2\mu^{1/3}-\mu^{2/3}\;}
+  \tag{1}
+\end{equation}
+for every mass ratio --- no expansion in $\mu$, no root-finding. Sun--Earth:
+$\beta_{\mathrm{crit}}=0.028646456169$, standoff \SI{2158294}{\kilo\metre}.
+Checked against independent Brent root-finding on $s(\beta)-1$ at machine
+precision (\num{2.1e-16} at Sun--Earth; $\leq\num{1.9e-15}$ over a 61-point
+sweep of $\mu\in[10^{-7},10^{-2}]$).
+
+\medskip
+\noindent\textbf{2. Why $s=1$ is not an arbitrary level.}
+Generalise to $s=\kappa$, so $r_2=(\mu/\kappa)^{1/3}=(3/\kappa)^{1/3}r_H$. The
+same substitution gives a closed form for \emph{every} $\kappa$,
+\begin{equation}
+  \beta(\kappa)=1-\frac{(1-r_2)^2}{1-\mu}\Bigl[(1-\mu)
+  +\underbrace{\mu^{1/3}\kappa^{-1/3}(\kappa-1)}_{\textstyle\Delta(\kappa)}\Bigr],
+  \tag{2}
+\end{equation}
+and the residue satisfies $\Delta(\kappa)=0 \iff \kappa=1$. Only at parity does
+the smaller primary drop out of the balance identically, leaving
+$1-\beta=r_1^2$ and hence the pure square (1). Two markers already in the
+literature are members of this one family: the Hill-sphere exit
+$r_2=r_H$ is exactly $\kappa=3$, and the classical $L_1$ sits at
+$\kappa=3.0303$.
+
+\vspace{-2pt}
+\begin{table}[h]
+  \centering\small
+  \caption{The hierarchy for Sun--Earth from (2); $\tau_u=1/\lambda_u$ is the
+  e-folding time of the residual saddle.}
+  \vspace{-4pt}
+  \begin{tabular}{lccccl}
+    \toprule
+    $\kappa$ & $\beta$ & $r_2/r_H$ & standoff [\si{\kilo\metre}] & $\tau_u$ [d] & \\
+    \midrule
+    \num{3.0303} & \num{0.000000} & \num{0.9967} & \num{1491472} & \num{23.0} & classical $L_1$\\
+    \num{3}      & \num{0.000298} & \num{1.0000} & \num{1496477} & \num{23.1} & Hill-sphere exit\\
+    \num{1}      & \num{0.028646} & \num{1.4422} & \num{2158294} & \num{38.6} & \textbf{tidal parity}\\
+    \num{0.1}    & \num{0.087462} & \num{3.1072} & \num{4649903} & \num{109.7} & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\vspace{-6pt}
+\noindent\textbf{3. A universal bound on the frequency ratio.}
+The collinear parameter $A=(1-\beta)(1-\mu)/r_1^3+\mu/r_2^3$ is exactly
+Richardson's $c_2$; a sail detunes it continuously. With
+$\nu=\sqrt{c_2}$ out of plane and $\omega^2=\tfrac12[D-(c_2-2)]$,
+$D=\sqrt{c_2(9c_2-8)}$, in plane, the ratio depends on $c_2$ alone. Setting
+$\mathrm{d}(\nu^2/\omega^2)/\mathrm{d}c_2=0$ reduces to $D=2c_2$, hence
+$9c_2^2-8c_2=4c_2^2$ and
+\begin{equation}
+  c_2^\star=\tfrac85,\qquad
+  \lambda_u^2:\nu^2:\omega^2=7:8:9,\qquad
+  \frac{\nu}{\omega}\Big|_{c_2^\star}=\frac{2\sqrt2}{3},
+  \tag{3}
+\end{equation}
+so that over the whole admissible range $c_2>1$,
+\begin{equation}
+  \frac{\nu}{\omega}\in\Bigl[\tfrac{2\sqrt2}{3},\,1\Bigr),
+  \qquad\text{a band \SI{5.72}{\percent} wide.}
+  \tag{4}
+\end{equation}
+Both $c_2^\star$ and the bound are independent of $\mu$: they are properties of
+the collinear linearisation, shared by every three-body system, sail or no sail.
+Ceccaroni, Celletti \& Pucacco note that the centre-manifold frequencies are
+``almost equal for all mass ratios''; (4) makes that exact and bounds the
+detuning $\delta=\omega-\nu$ that normal-form treatments of the collinear
+points rely on.
+
+\medskip
+\noindent\textbf{4. No low-order commensurability is available.}
+The largest rational below unity at denominator $q$ is $(q-1)/q$, so
+$p{:}q$ can lie in (4) only if $(q-1)/q\geq2\sqrt2/3$, i.e.
+$q\geq(1-2\sqrt2/3)^{-1}=17.485\ldots$, so $q\geq18$. \emph{The band contains
+no commensurability of denominator below 18}; the lowest-order one it admits is
+$17{:}18$, of order 35. Neither threshold is therefore a bifurcation --- $s>0$
+for all finite $r_2$, so the saddle never disappears --- and I present both as
+exact structural landmarks rather than dynamical transitions.
+
+\medskip
+\noindent\textbf{5. Where this sits against flown hardware.}
+Reducing $\beta$ from primary specifications ($\beta=\sigma^\ast/\sigma$,
+$\sigma^\ast=\SI{1.5311}{\gram\per\metre\squared}$), no sail flown and deployed
+reaches $\beta=0.0062$: LightSail-2 is $0.00613$, and the only \emph{measured}
+value is IKAROS at $0.00062$. Tidal parity is a factor $4.7$ beyond the best
+deployed sail and $1.4$ beyond Solar Cruiser as designed.
+
+\medskip
+\hrule
+\vspace{4pt}
+\noindent\small
+\textbf{What I would most value your view on.} (i) Whether the closed
+form (1) --- or the $\kappa$ family (2) --- has appeared before in the
+photogravitational CR3BP literature, which I have not been able to search
+exhaustively. (ii) Whether ``tidal parity'' is a defensible reading of $s=1$, or
+whether the $\kappa$-hierarchy framing of \S2 is the honest way to present it.
+(iii) Whether the bound (4) is known; I have not found it stated.
+
+\smallskip
+\noindent
+The full preprint (18 pp.) and a companion document giving every derivation
+step and an account of each reported residual are available on request. All
+code and data are public at
+\url{https://github.com/Bishwaswarup/SOLAR_SAIL} (tag \texttt{arxiv-v1});
+every number above is regenerated by the pipeline and machine-checked against
+the manuscript source by \texttt{paper/verify\_numbers.py}, which asserts 175
+numerical claims and parses the tables out of the \LaTeX{} directly.
+
+\end{document}

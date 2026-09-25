@@ -13,6 +13,14 @@ __pycache__/
 venv/
 env/
 
+# Files the Claude desktop app drops into the folder when it delivers a
+# deliverable.  These are copies of things already produced by the pipeline
+# (paper/arxiv/*.pdf), so they are working copies, not sources.  Two of them
+# were committed by accident and removed again in "Delete outputs directory".
+Claude outputs/
+claude outputs/
+Claude Outputs/
+
 # LaTeX build artefacts.  The .bbl is DELIBERATELY not ignored -- arXiv needs
 # it shipped in the submission package, since it runs no bibtex.
 *.aux

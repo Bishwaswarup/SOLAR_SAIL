@@ -34,3 +34,4 @@ paper outputs/
 # macOS bundle noise
 __MACOSX/
 ._*
+.claude/

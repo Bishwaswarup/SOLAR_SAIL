@@ -328,6 +328,42 @@ for _ks, _bs, _r2s, _rrs, _kms, _taus in _hrows:
     chk(f'tab:hierarchy k={_ks}: tau_u [d]',
         TU_D / linear_modes(float(_bs), MU_SE)['lam_u'], float(_taus), tol=0.1)
 
+# ── Sec 6: fine atlas, where the family's end switches (tab:fine) ─────────
+# Parsed out of main.tex and compared cell by cell with the machine-written
+# halo_atlas_fine_ends.csv (python main.py atlas_fine).
+_fine_csv = 'halo_atlas_fine_ends.csv'
+if _os.path.exists(_fine_csv):
+    with open(_fine_csv) as _fh:
+        _fine = {round(float(r['beta']), 6): r for r in _csv.DictReader(_fh)}
+    _blk = tex[tex.find(r'\label{tab:fine}'):]
+    _blk = _blk[:_blk.find(r'\bottomrule')]
+    _fine_re = re.compile(r'\$([0-9.]+)\$\s*&\s*(\d+)\s*&\s*([0-9.]+)\s*&\s*(\d+)'
+                          r'\s*&\s*(bound|planar)\s*\\\\')
+    _frows = _fine_re.findall(_blk)
+    chk('tab:fine: rows parsed from main.tex', len(_frows), len(_fine), tol=0)
+    _endmap = {'bound': 'completed', 'planar': 'collapse'}
+    for _bs, _ms, _azs, _fs, _ends in _frows:
+        _r = _fine.get(round(float(_bs), 6))
+        if _r is None:
+            chk(f'tab:fine beta={_bs}: present in CSV', 0, 1, tol=0)
+            continue
+        chk(f'tab:fine beta={_bs}: members', int(_r['members']), int(_ms), tol=0)
+        chk(f'tab:fine beta={_bs}: max Az/gamma',
+            float(_r['Az_max_over_gamma']), float(_azs), tol=5e-4)
+        chk(f'tab:fine beta={_bs}: folds', int(_r['n_folds']), int(_fs), tol=0)
+        chk(f'tab:fine beta={_bs}: end class matches',
+            int(_r['end'] == _endmap[_ends]), 1, tol=0)
+    _comp = [b for b, r in _fine.items() if r['end'] == 'completed']
+    _coll = [b for b, r in _fine.items() if r['end'] == 'collapse']
+    chk('tab:fine: last bound beta', max(_comp), 0.038, tol=0)
+    chk('tab:fine: first planar beta', min(_coll), 0.039, tol=0)
+    chk('tab:fine: classes separated by one switch',
+        int(max(_comp) < min(_coll)), 1, tol=0)
+    chk('tab:fine: Verrier branch point 0.0387 inside (0.038, 0.039]',
+        int(max(_comp) < 0.0387 <= min(_coll)), 1, tol=0)
+else:
+    chk(f'tab:fine: {_fine_csv} exists (run python main.py atlas_fine)', 0, 1, tol=0)
+
 # ── Sec 4.4: the operational e-fold horizons (tab:efold) ────────────────────
 chk('operational: tau_u at beta=0 is the classical L1 e-folding time [d]',
     TU_D / linear_modes(0.0, MU_SE)['lam_u'], 22.95, tol=0.01)

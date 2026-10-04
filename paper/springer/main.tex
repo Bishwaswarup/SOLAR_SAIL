@@ -782,8 +782,7 @@ Doedel \emph{et al.}~\cite{doedel2007}. The evolution of this family with
 $\beta$ in the same face-on sail problem was studied by Verrier, Waters and
 Sieber~\cite{verrier2014}, who report that a branch point at
 $\beta\approx0.0387$ splits the $L_1$ halo family; that value lies inside the
-band walked here, and the weakening of the branch discriminator reported below
-towards the top of the band should be read against it.
+band walked here, and we compare against it at the end of this section.
 
 Two methodological points are load-bearing. First, all lengths are expressed in
 units of the local scale $\gamma=\lvert(1-\mu)-x_{\mathrm{eq}}\rvert$, which
@@ -830,6 +829,48 @@ computed from~\eqref{eq:jacobi}; because the potential~\eqref{eq:U} is itself
 $\beta$-dependent, raw $C_{\mathrm{sail}}$ is not comparable across $\beta$, and
 we plot instead the depth below the local equilibrium,
 $C_{\mathrm{sail}}-C_{\mathrm{sail}}(x_{\mathrm{eq}})$, against $A_z/\gamma$.
+
+\paragraph{Comparison with Verrier, Waters and Sieber.} The atlas walks stop
+after 70 members, which characterises each family but does not show where it
+ends. To locate the end, we re-walk nine values of $\beta$ between $0.032$ and
+$0.045$ with a budget of 450 members, enough for every walk to terminate on a
+bound, and classify each family by how it terminates (Table~\ref{tab:fine}).
+Up to $\beta=0.038$ the family runs out to the amplitude bound $A_z=\gamma$
+after about 300 members and two folds. From $\beta=0.039$ onward it turns back
+and returns to $A_z=0$, that is, to the planar Lyapunov family, after at most
+81 members. The change therefore lies in $\beta\in(0.038,\,0.039]$, an interval
+that contains the branch point $\beta\approx0.0387$ at which Verrier
+\emph{et al.}~\cite{verrier2014} find the $L_1$ halo family split. The two
+calculations use different continuation schemes and different diagnostics, so
+we read the agreement as an independent check of their value, here to within
+$10^{-3}$ in $\beta$. We do not resolve the branch point itself, only the change
+in where the continued family ends; the $\beta=0.040$ walk of the main atlas,
+which also returns to $A_z=0$ after 40 members, lies on the far side of it.
+
+\begin{table}[t]
+  \centering
+  \caption{How the continued $L_1$ halo family ends, walked to termination on a
+  fine grid in $\beta$ (budget 450 members, chained seeding). \emph{Bound}: the
+  walk reached the amplitude bound $A_z=\gamma$. \emph{Planar}: it turned back
+  to $A_z=0$. Folds counts turning points in $A_z$. Reproduced by
+  \texttt{python main.py atlas\_fine}.}
+  \label{tab:fine}
+  \begin{tabular}{ccccc}
+    \toprule
+    $\beta$ & members & $\max A_z/\gamma$ & folds & end \\
+    \midrule
+    $0.032$  & 298 & 0.996 & 2 & bound \\
+    $0.034$  & 305 & 0.990 & 2 & bound \\
+    $0.036$  & 308 & 0.990 & 2 & bound \\
+    $0.038$  & 313 & 0.992 & 2 & bound \\
+    $0.039$  & 81  & 0.784 & 2 & planar \\
+    $0.0395$ & 56  & 0.781 & 2 & planar \\
+    $0.040$  & 40  & 0.776 & 1 & planar \\
+    $0.042$  & 32  & 0.760 & 1 & planar \\
+    $0.045$  & 57  & 0.739 & 1 & planar \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \begin{figure}[t]
   \centering
@@ -1099,6 +1140,10 @@ threshold, and we present them as scale markers rather than transitions. The
 sail's role is to tune $c_2$ within a given system, reaching values ---
 including the bound, at $\beta=0.0409$ for Sun--Earth --- that that system's
 classical collinear points do not offer.
+
+Re-walking the halo family to termination on a fine grid in $\beta$ places
+the change in where it ends in $(0.038,\,0.039]$, bracketing the branch point
+reported by Verrier \emph{et al.} at $\beta\approx0.0387$.
 
 Finally, the face-on nominal is singular in the attitude angles: the clock
 angle has no first-order authority, so a face-on sail is a single-input system,

@@ -179,9 +179,9 @@ def paper_table() -> str:
     # the flown sail band (beta ~ 0.01-0.05)".  That band is unsourced and is
     # NOT supported by any flown mission -- see src/sail_technology.py, which
     # reduces beta from primary specifications for every sail ever flown and
-    # finds none above 0.00613.  Keep this text consistent with that module.
-    L.append("  Sun-Earth sits at beta_crit = 0.0286, a factor of 4.7 beyond the")
-    L.append("  best sail flown and deployed (LightSail-2, beta = 0.00613; see")
+    # finds none above 0.00617.  Keep this text consistent with that module.
+    L.append("  Sun-Earth sits at beta_crit = 0.0286, a factor of 4.6 beyond the")
+    L.append("  best sail flown and deployed (LightSail-2, beta = 0.00617; see")
     L.append("  src/sail_technology.py).  Standoff at parity: r2 = mu^(1/3) = "
              f"{MU_SE ** (1 / 3) * AU_KM:,.0f} km = 3^(1/3) r_H.")
     return "\n".join(L)

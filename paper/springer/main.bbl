@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{41}
+\begin{thebibliography}{42}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -661,6 +661,19 @@ NASA
 \endbibitem
 
 %%% 41
+\bibitem[\protect\citeauthoryear{{Japan Aerospace Exploration
+  Agency}}{2010}]{jaxa2010ikaros}
+\begin{botherref}
+\oauthor{\bsnm{{Japan Aerospace Exploration Agency}}}:
+Small Solar Power Sail Demonstrator `{IKAROS}' Confirmation of Photon
+  Acceleration.
+Press release, 9 July 2010
+(2010).
+\url{https://www.jaxa.jp/press/2010/07/20100709_ikaros_e.html}
+\end{botherref}
+\endbibitem
+
+%%% 42
 \bibitem[\protect\citeauthoryear{Aliasi et~al.}{2015}]{aliasi2015}
 \begin{barticle}
 \bauthor{\bsnm{Aliasi}, \binits{G.}},

@@ -50,7 +50,7 @@ $c_2=8/5$, where $\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both results are
 independent of $\mu$, and the band contains no commensurability of denominator
 below $18$, so neither marks a bifurcation: they are exact structural landmarks
 of a smooth degeneration. Parity corresponds to an instability e-folding time
-of \SI{38.6}{\day} at Sun--Earth and lies a factor of $4.7$ beyond the best
+of \SI{38.6}{\day} at Sun--Earth and lies a factor of $4.6$ beyond the best
 sail flown. Finally, at the face-on attitude the clock angle has no first-order
 authority, so the sail is a single-input system, uncontrollable for purely
 in-plane or purely vertical tilt and controllable otherwise because
@@ -1017,9 +1017,12 @@ the chain.
   \caption{Lightness number of every solar sail flown or funded to flight
   hardware, reduced from primary specifications. $\beta_{\mathrm{ideal}}$ is the
   perfect-reflector limit; $\beta_{\mathrm{eff}}$ applies the optical efficiency
-  $\eta=1.12/1.79=0.626$ measured on IKAROS. IKAROS is the only entry whose
-  lightness number follows from a \emph{measured} thrust and needs no optical
-  assumption. Solar Cruiser has no published mass; its $\beta_{\mathrm{ideal}}$
+  $\eta=1.12/1.78=0.629$, the ratio of the IKAROS thrust estimated from orbit
+  determination (\SI{1.12}{\milli\newton}~\cite{jaxa2010ikaros}) to the ideal
+  flat-sail value $2PA=\SI{1.78}{\milli\newton}$ at 1~au. IKAROS is the only entry whose lightness number follows from
+  an in-flight thrust estimate rather than from area and mass; the heliocentric
+  distance of that estimate is not reported, so its $\beta$ and $\eta$ are
+  approximate. Solar Cruiser has no published mass; its $\beta_{\mathrm{ideal}}$
   is reduced instead from the published characteristic acceleration
   $\geq\SI{0.12}{\milli\metre\per\second\squared}$, and is therefore a lower
   bound rather than a value obtainable from the area column.}
@@ -1029,18 +1032,18 @@ the chain.
     mission & area [\si{\metre\squared}] & mass [\si{\kilogram}] &
     $\beta_{\mathrm{ideal}}$ & $\beta_{\mathrm{eff}}$ & status \\
     \midrule
-    IKAROS~\cite{mori2010,tsuda2011}   & 196  & 307 & \num{0.00098} & \num{0.00062} & flown 2010, measured \\
-    LightSail-2~\cite{spencer2021}     & 32   & 5   & \num{0.00980} & \num{0.00613} & flown 2019 \\
-    NEA Scout~\cite{mcnutt2014}        & 86   & 14  & \num{0.00941} & \num{0.00588} & sail not deployed, lost 2022 \\
-    ACS3~\cite{acs3}                   & 80   & 16  & \num{0.00766} & \num{0.00479} & flown 2024 \\
+    IKAROS~\cite{mori2010,tsuda2011}   & 196  & 307 & \num{0.00098} & \num{0.00062} & flown 2010, in-flight estimate \\
+    LightSail-2~\cite{spencer2021}     & 32   & 5   & \num{0.00980} & \num{0.00617} & flown 2019 \\
+    NEA Scout~\cite{mcnutt2014}        & 86   & 14  & \num{0.00941} & \num{0.00592} & sail not deployed, lost 2022 \\
+    ACS3~\cite{acs3}                   & 80   & 16  & \num{0.00766} & \num{0.00482} & flown 2024 \\
     Solar Cruiser                      & 1653 & --- & \num{0.02024} & ---           & cancelled 2022 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 No sail flown and deployed reaches $\beta=\num{0.0062}$ --- the best is
-LightSail-2 at $\beta=\num{0.00613}$ --- and the only measured value is IKAROS
-at $\beta=\num{0.00062}$. Against
+LightSail-2 at $\beta=\num{0.00617}$ --- and the only value based on an in-flight
+thrust estimate is IKAROS at $\beta=\num{0.00062}$. Against
 $\beta_{\mathrm{crit}}=\num{0.028646}$:
 
 \begin{center}
@@ -1049,14 +1052,14 @@ $\beta_{\mathrm{crit}}=\num{0.028646}$:
   reference & $\beta$ & shortfall \\
   \midrule
   best flown, perfect-reflector limit (LightSail-2) & \num{0.009799} & $2.9\times$ \\
-  best flown, realistic (LightSail-2)               & \num{0.006131} & $4.7\times$ \\
-  only measured value (IKAROS)                      & \num{0.000615} & $47\times$ \\
+  best flown, realistic (LightSail-2)               & \num{0.006167} & $4.6\times$ \\
+  only in-flight estimate (IKAROS)                  & \num{0.000615} & $47\times$ \\
   most ambitious funded design (Solar Cruiser, cancelled) & \num{0.020236} & $1.4\times$ \\
   \bottomrule
 \end{tabular}
 \end{center}
 
-Tidal parity is therefore a factor of $4.7$ beyond the best sail flown and
+Tidal parity is therefore a factor of $4.6$ beyond the best sail flown and
 deployed --- $2.9$ if that sail is credited with a perfect reflector --- and a
 factor of $1.4$ beyond the most ambitious design funded to flight hardware.
 The defensible statement is that it lies at the edge of \emph{near-term} rather
@@ -1084,7 +1087,7 @@ case is open and is the natural sequel.
 self-shadowing, and wavelength-dependent optics are not modelled. Dachwald
 \emph{et al.}~\cite{dachwald2013} argue persuasively that non-ideal optics matter
 more than order-of-magnitude estimates suggest; the IKAROS efficiency
-$\eta=0.626$ in Table~\ref{tab:tech} is a single-mission proxy, not a general
+$\eta=0.629$ in Table~\ref{tab:tech} is a single-mission proxy, not a general
 correction. Generalised-sail models~\cite{aliasi2011,aliasi2015} are the
 natural setting for that extension, and the elliptic problem, in which the
 equilibria themselves become periodic, has been treated for sails
@@ -1152,8 +1155,8 @@ components, and a few degrees of cone angle are required to recover a
 well-conditioned second input. Authority peaks at the classical optimal
 cone angle $\arctan(1/\sqrt2)$, where the conditioning is exactly $1/3$.
 
-Set against flown hardware, tidal parity is a factor $4.7$ beyond the best
-deployed sail and $47$ beyond the only measured lightness number. It is a
+Set against flown hardware, tidal parity is a factor $4.6$ beyond the best
+deployed sail and $47$ beyond the only lightness number estimated in flight. It is a
 near-term design boundary, not a present one.
 
 \backmatter

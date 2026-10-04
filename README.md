@@ -45,16 +45,16 @@ The tidal-parity threshold has an exact closed form. Imposing r₂ = μ^(1/3) on
 
 exactly — no expansion in μ, no root-finding. It therefore depends on the system *only* through μ^(1/3). For Sun–Earth it lands at **β ≈ 0.028646**.
 
-Where that sits against real hardware is a checkable question, and the answer is **not** "already achievable". Reduced from primary specifications ([`src/sail_technology.py`](src/sail_technology.py)), every solar sail ever flown sits at β ≤ 0.0061:
+Where that sits against real hardware is a checkable question, and the answer is **not** "already achievable". Reduced from primary specifications ([`src/sail_technology.py`](src/sail_technology.py)), every solar sail ever flown sits at β ≤ 0.0062:
 
 | sail | β | note |
 |---|---|---|
-| IKAROS (2010) | 0.00062 | the only **measured** value — from JAXA's 1.12 mN |
+| IKAROS (2010) | 0.00062 | the only in-flight estimate — from JAXA's 1.12 mN (orbit determination) |
 | ACS3 (2024) | 0.0048 | 80 m², 16 kg |
-| LightSail-2 (2019) | 0.0061 | 32 m², 5 kg — best flown |
+| LightSail-2 (2019) | 0.0062 | 32 m², 5 kg — best flown |
 | Solar Cruiser | 0.0202 | design only, cancelled 2022 |
 
-So tidal parity is **a factor of 4.7 beyond the best sail flown and deployed** — 2.9 if that sail is credited with a perfect reflector — and **a factor of 1.4 beyond the most ambitious funded design** (β_crit is 41.6 % above Solar Cruiser, not "within 40 %" of it). The defensible claim is that it lies at the edge of *near-term* capability — which is stronger than the unsourced version precisely because it can be checked. Every factor here is printed by `compare_to_threshold()` in [`src/sail_technology.py`](src/sail_technology.py) and appears in [`results.txt`](results.txt); none is written out by hand.
+So tidal parity is **a factor of 4.6 beyond the best sail flown and deployed** — 2.9 if that sail is credited with a perfect reflector — and **a factor of 1.4 beyond the most ambitious funded design** (β_crit is 41.6 % above Solar Cruiser, not "within 40 %" of it). The defensible claim is that it lies at the edge of *near-term* capability — which is stronger than the unsourced version precisely because it can be checked. Every factor here is printed by `compare_to_threshold()` in [`src/sail_technology.py`](src/sail_technology.py) and appears in [`results.txt`](results.txt); none is written out by hand.
 
 <div align="center"><img src="fig8_structure_dissolution.png" width="95%"/></div>
 

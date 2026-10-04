@@ -14,22 +14,22 @@ without a source.  It does not survive checking.
 Reducing every mission to beta from PRIMARY specifications (area, mass, and
 where available a measured thrust) gives, for every solar sail ever flown:
 
-    IKAROS        beta = 6.2e-4    (measured, not inferred)
+    IKAROS        beta = 6.2e-4    (in-flight thrust estimate, not inferred)
     ACS3          beta = 4.8e-3
-    LightSail-2   beta = 6.1e-3
+    LightSail-2   beta = 6.2e-3
     NEA Scout     beta = 5.9e-3    (sail never deployed; design value)
 
-The best flown value is LightSail-2 at 6.1e-3, or 9.8e-3 if one credits it with
+The best flown value is LightSail-2 at 6.2e-3, or 9.8e-3 if one credits it with
 a perfect reflector.  Even the cancelled Solar Cruiser DESIGN reached only 0.020.
 So beta_crit = 0.0286 is:
 
     2.9x  the best flown sail at its ideal-reflector limit (LightSail-2, 9.8e-3)
-    4.7x  the best flown sail realistically  (LightSail-2, 6.1e-3)
+    4.6x  the best flown sail realistically  (LightSail-2, 6.2e-3)
     1.4x  the most ambitious funded design ever built to (Solar Cruiser, 0.020)
-     47x  the only sail with a MEASURED lightness number (IKAROS, 6.2e-4)
+     47x  the only sail with an in-flight lightness estimate (IKAROS, 6.2e-4)
 
 The honest claim is therefore NOT "already achievable".  It is that tidal parity
-sits a factor of 4.7 beyond flown hardware and a factor of 1.4 beyond a sail NASA
+sits a factor of 4.6 beyond flown hardware and a factor of 1.4 beyond a sail NASA
 had already designed and begun building — which is a stronger and more interesting
 statement than the unsupported one, because it is checkable.
 
@@ -55,10 +55,11 @@ constants reproduces McInnes' standard critical loading to four figures:
     sigma*   = 2P / g_sun     = 1.5311 g/m^2       (McInnes gives 1.53)
 
 Equation (1) assumes a perfect specular reflector.  Real sails fall short, and
-IKAROS is the one mission that pins the shortfall by measurement: JAXA reported
-an ideal thrust of 1.79 mN against a measured 1.12 mN, so
+IKAROS is the one mission with an in-flight estimate: JAXA's orbit determination
+gives 1.12 mN [1] (heliocentric distance not stated), taken here against an
+ideal flat-sail thrust 2PA = 1.78 mN at 1 AU (A = 196 m^2), so
 
-    optical efficiency  eta = 1.12 / 1.79 = 0.626                          (2)
+    optical efficiency  eta = 1.12 / 1.78 = 0.629                          (2)
 
 `beta_ideal` below applies (1) alone; `beta_effective` applies (1) with eta from
 (2).  For IKAROS neither is needed — beta comes straight from the measured
@@ -67,7 +68,8 @@ thrust and the spacecraft mass, and is the only entry here that is not inferred.
 Sources
 ───────
 [1] JAXA press release, 9 July 2010, "Small Solar Power Sail Demonstrator
-    'IKAROS' Confirmation of Photon Acceleration".  Measured thrust 1.12 mN.
+    'IKAROS' Confirmation of Photon Acceleration".  Thrust estimated by
+    orbit determination: 1.12 mN.
     https://www.jaxa.jp/press/2010/07/20100709_ikaros_e.html
 [2] eoPortal, IKAROS mission summary.  307 kg wet mass (293 kg dry); sail 20 m
     diagonal, ~196 m^2.   https://www.eoportal.org/satellite-missions/ikaros
@@ -109,8 +111,11 @@ G_SUN_1AU = GM_SUN / AU_M**2    # 5.9301e-3 m/s^2
 P_SRP     = W_SOLAR / C_LIGHT   # 4.5398e-6 N/m^2
 SIGMA_CRIT = 2.0 * P_SRP / G_SUN_1AU     # 1.5311e-3 kg/m^2
 
-# IKAROS optical efficiency: JAXA's ideal 1.79 mN against measured 1.12 mN [1].
-ETA_IKAROS = 1.12 / 1.79        # 0.626
+# IKAROS optical efficiency: JAXA's orbit-determination thrust (1.12 mN [1])
+# against the ideal flat-sail thrust 2PA at 1 AU for the 196 m^2 sail (1.78 mN).
+IKAROS_THRUST_N = 1.12e-3
+IKAROS_AREA_M2 = 196.0
+ETA_IKAROS = IKAROS_THRUST_N / (2.0 * P_SRP * IKAROS_AREA_M2)   # 0.629
 
 
 class Sail:

@@ -30,7 +30,7 @@ from src.sail_authority import (ALPHA_STAR, COND_AT_STAR, COS2_ALPHA_STAR,
                                 controllability_rank, linearised_cr3bp,
                                 sail_control_jacobian, thruster_jacobian)
 
-TEX = os.environ.get('SOLARSAIL_TEX', 'paper/main.tex')  # set to paper/springer/main.tex for the journal version
+TEX = os.environ.get('SOLARSAIL_TEX', 'paper/springer/main.tex')  # journal version; set SOLARSAIL_TEX=paper/main.tex for the archived arXiv text
 AU_KM = 1.495978707e8
 
 checks, failures = [], []
@@ -160,9 +160,9 @@ chk('conditioning at alpha0=0.5deg', sv[0] / sv[1], 115.0, tol=2.0)
 try:
     from src.sail_technology import flown_beta_range
     lo, hi = flown_beta_range()
-    chk('best flown beta', hi, 0.00613, tol=1e-5)
+    chk('best flown beta', hi, 0.006167, tol=1e-5)
     chk('lowest flown beta', lo, 0.00062, tol=1e-5)
-    chk('shortfall vs best flown', b_exact / hi, 4.7, tol=0.05)
+    chk('shortfall vs best flown', b_exact / hi, 4.6, tol=0.05)
 except Exception as exc:                                      # noqa: BLE001
     checks.append(('sail_technology import', float('nan'), float('nan'), False))
     failures.append(f'sail_technology: {exc}')
@@ -399,7 +399,7 @@ chk('Sec 5.2: the 1/(1-2sqrt2/3) threshold', 1 / (1 - _lo), 17.4853, tol=1e-3)
 
 # ── cross-check: do these literals actually appear in main.tex? ─────────────
 literals = ['0.028646456169', '7:8:9', '0.480187660',
-            '35.264', '1.569787', '0.00613', '4.060819', '2.014635',
+            '35.264', '1.569787', '0.00617', '4.060819', '2.014635',
             '1.505418', '0.040932', '17{:}18', '0.015441', '0.127015',
             '22.95', '58.1324', 'celletti2024',
             'c_2', 'ceccaroni2016', 'richardson1980', 'gomez2001',

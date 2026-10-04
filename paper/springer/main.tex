@@ -37,42 +37,24 @@ circular restricted three-body problem; it dissolves it. Because the radiation
 force is radial and therefore conservative, it rescales solar gravity as
 $(1-\mu)\to(1-\beta)(1-\mu)$, and the on-axis equilibrium degenerates smoothly
 into a heliocentric hovering point as the lightness number $\beta$ grows. We
-characterise that degeneration and obtain two exact results. First, imposing
-\emph{tidal parity} --- the condition that the smaller primary's contribution to
-the linearised dynamics equal the centrifugal background, $s\equiv\mu/r_2^3=1$,
-equivalently $r_2=\mu^{1/3}=3^{1/3}r_H$ --- on the on-axis force balance yields
-the closed form
-$\beta_{\mathrm{crit}}=1-\bigl(1-\mu^{1/3}\bigr)^2=2\mu^{1/3}-\mu^{2/3}$,
-exact for every mass ratio and verified against independent root-finding at
-machine precision over $\mu\in[10^{-7},10^{-2}]$ (\num{2.1e-16} at Sun--Earth). For Sun--Earth this gives
-$\beta_{\mathrm{crit}}=0.0286$. Second, writing $c_2$ for the second Legendre
-coefficient of the collinear expansion --- the quantity a sail detunes
-continuously, and which is otherwise fixed by the mass ratio and the choice of
-point --- the ratio of the out-of-plane to in-plane linear frequencies at any
-collinear equilibrium is confined to $\nu/\omega\in[2\sqrt2/3,\,1)$, a band
-\SI{5.72}{\percent} wide which we show contains no commensurability of
-denominator below $18$. The bound is attained
-exactly at $c_2=8/5$, where the three linear rates stand in the ratio
-$\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both $c_2=8/5$ and the bound are independent
-of $\mu$. That the two frequencies are nearly equal at collinear points is known; we
-make the statement exact. We emphasise that neither result is a bifurcation: the saddle persists
-for all $\beta$ and the degeneration is smooth, so these are exact structural
-landmarks rather than dynamical transitions, and the lowest-order
-commensurability the band admits at all is $17{:}18$, of order $35$. We further
-show that tidal parity is not an arbitrary level: generalising the condition to
-$s=\kappa$ yields a closed form for every $\kappa$, and $\kappa=1$ is the unique
-level at which the smaller primary drops out of the on-axis balance identically.
-Read operationally through the instability e-folding time, parity corresponds to
-\SI{38.6}{\day} at Sun--Earth, between the \SI{30}{\day} and \SI{90}{\day}
-mission horizons. Reducing $\beta$ from primary
-mission specifications, we find that no solar sail yet flown reaches
-$\beta=0.0062$, placing tidal parity a factor of $4.7$ beyond demonstrated
-capability. Finally, linearising the sail acceleration in its two attitude
-angles shows that at the face-on nominal the clock angle has no first-order
-authority, $\partial\bm{a}/\partial\delta\equiv\bm{0}$, so a face-on sail is a
-single-input system: it is uncontrollable for purely in-plane or purely
-vertical tilt and controllable otherwise, because $\nu\neq\omega$ at every
-collinear equilibrium. Any non-zero cone angle restores the second input.}
+obtain two exact results. First, imposing \emph{tidal parity}, the condition
+that the smaller primary's tidal term $s=\mu/r_2^{3}$ equal the centrifugal
+background, yields $\beta_{\mathrm{crit}}=2\mu^{1/3}-\mu^{2/3}$, exact for every
+mass ratio and verified to machine precision over $\mu\in[10^{-7},10^{-2}]$;
+for Sun--Earth, $\beta_{\mathrm{crit}}=0.0286$. Parity is the unique level of
+the family $s=\kappa$ at which the smaller primary drops out of the on-axis
+balance identically. Second, the ratio of the out-of-plane to in-plane linear
+frequencies at any collinear equilibrium is confined to
+$\nu/\omega\in[2\sqrt2/3,\,1)$, with the bound attained at Legendre coefficient
+$c_2=8/5$, where $\lambda_u^2:\nu^2:\omega^2=7:8:9$. Both results are
+independent of $\mu$, and the band contains no commensurability of denominator
+below $18$, so neither marks a bifurcation: they are exact structural landmarks
+of a smooth degeneration. Parity corresponds to an instability e-folding time
+of \SI{38.6}{\day} at Sun--Earth and lies a factor of $4.7$ beyond the best
+sail flown. Finally, at the face-on attitude the clock angle has no first-order
+authority, so the sail is a single-input system, uncontrollable for purely
+in-plane or purely vertical tilt and controllable otherwise because
+$\nu\neq\omega$.}
 
 \keywords{Solar sail, Restricted three-body problem, Photogravitational problem, Artificial equilibria, Collinear points, Legendre coefficient $c_2$, Halo orbits, Controllability}
 
@@ -327,8 +309,10 @@ by~\eqref{eq:hover} and hence $S\to1$, so
 We call $s$ the \emph{saddle strength}. Because $s>0$ for all finite $r_2$, the
 saddle never strictly disappears: there is no bifurcation, only a smooth decay,
 and the physically meaningful statement is its rate. Table~\ref{tab:collapse}
-records that rate and Figure~\ref{fig:stability} the accompanying collapse of
-$\lambda_u$; $s$ falls four decades between $\beta=0$ and $\beta=0.5$.
+records that rate, and $s$ falls four decades between $\beta=0$ and
+$\beta=0.5$. Figure~\ref{fig:stability} shows the corresponding decline across
+the flown band for a fixed-amplitude halo orbit, whose largest Floquet
+multiplier falls from $1385$ at $\beta=0$ to $86$ at $\beta=0.05$.
 
 It is worth being precise about~\eqref{eq:As}, because the convergence is slower
 than it looks. At tidal parity, $S=(1-\mu)/(1-\mu^{1/3})=1.014635$ exactly, so
@@ -863,9 +847,12 @@ $C_{\mathrm{sail}}-C_{\mathrm{sail}}(x_{\mathrm{eq}})$, against $A_z/\gamma$.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.78\textwidth]{fig2_stability.png}
-  \caption{Collapse of the unstable eigenvalue with $\beta$. The trend is not
-  sail stabilisation of a saddle: the standoff grows, the smaller primary's
-  tidal term dies, and the orbit moves away from the saddle it began near.}
+  \caption{Largest Floquet multiplier (left) and period (right) of the
+  $L_1$ halo orbit with $A_z=0.003$ across the flown band
+  $0\le\beta\le0.05$; every member is checked to be a halo rather than a
+  vertical Lyapunov orbit. The decline is not sail stabilisation of a saddle:
+  the standoff grows, the smaller primary's tidal term weakens, and the orbit
+  moves away from the saddle it began near.}
   \label{fig:stability}
 \end{figure}
 
@@ -1142,15 +1129,13 @@ The author did not receive support from any organization for the submitted work.
 The author has no relevant financial or non-financial interests to disclose.
 
 \bmhead{Use of AI-assisted tools}
-%% >>> AUTHOR: check this paragraph describes what was actually done. <<<
-The author used Claude (Anthropic) as an assistant for editing manuscript text,
-for checking the code and fixing bugs, for auditing the numerical claims of the
-manuscript against the code output, and for searching and checking references.
-The author conceived and directed the study, chose the models and parameters,
-ran all computations and interpreted the results, and reviewed and verified all
-AI-assisted text, including through the automated check of every number in the
-paper described below. The author takes full responsibility for the content of
-this manuscript.
+The author used Claude (Anthropic) as an assistant for editing manuscript
+text, for auditing the numerical claims of the manuscript against the code
+output, and for searching and checking references. The author conceived and
+directed the study, chose the models and parameters, ran all computations and
+interpreted the results, and reviewed and verified all AI-assisted text,
+including through the automated check of every number in the paper described
+below. The author takes full responsibility for the content of this manuscript.
 
 \bmhead{Data and code availability}
 All numerical results, figures and the verification suite are reproducible from

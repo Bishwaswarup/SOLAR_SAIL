@@ -7,6 +7,7 @@ main.py — single entry point for the Sun-Earth solar-sail study.
     python main.py results        # recompute every headline number -> results.txt
     python main.py figures        # regenerate the paper figures
     python main.py atlas          # re-walk the halo families (SLOW, ~minutes)
+    python main.py atlas_fine     # fine-beta walk to the family's end (SLOW)
     python main.py earthmoon      # Earth-Moon material: NOT part of the paper
     python main.py all            # everything above except earthmoon
     python main.py list           # show the stages and exit
@@ -263,6 +264,21 @@ def stage_atlas() -> bool:
     return ok
 
 
+def stage_atlas_fine() -> bool:
+    """Walk the halo family to termination on a fine beta grid.  Slow.
+
+    Writes halo_atlas_fine.csv and halo_atlas_fine_ends.csv; does not touch
+    halo_atlas.csv or the paper figures.
+    """
+    _rule('ATLAS (FINE): where does the end of the family switch?')
+    from src import atlas
+    print(f"  betas: {', '.join(f'{b:g}' for b in atlas.FINE_BETAS)}")
+    print("  Each walk runs to termination (~up to 450 members); this takes "
+          "tens of minutes.\n")
+    ok, a = _step('walking families', atlas.fine_build_and_report)
+    return ok
+
+
 def stage_earthmoon() -> bool:
     """Earth-Moon material.  NOT part of the paper; see the module docstring."""
     _rule('EARTH-MOON  (out of scope for the paper)')
@@ -313,6 +329,7 @@ STAGES = {
     'results': stage_results,
     'figures': stage_figures,
     'atlas': stage_atlas,
+    'atlas_fine': stage_atlas_fine,
     'earthmoon': stage_earthmoon,
     'status': stage_status,
 }

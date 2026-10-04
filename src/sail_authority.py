@@ -53,17 +53,21 @@ CR3BP at the beta = 0.05 equilibrium (A = 1.409194):
     B_CTRL (the 6x3 thruster)                    rank 6/6   controllable
     sail, alpha0 = 0,  delta0 = 0                rank 4/6   UNCONTROLLABLE
     sail, alpha0 = 0,  delta0 = 90 deg           rank 2/6   UNCONTROLLABLE
+    sail, alpha0 = 0,  delta0 = 45 deg           rank 6/6   controllable (1 input)
     sail, alpha0 = 0.5 deg                       rank 6/6   controllable
     sail, alpha0 = 2, 5, 15, 35, 45 deg          rank 6/6   controllable
 
 The in-plane 4-state block IS controllable by a single transverse input
 (rank 4/4) — Coriolis does the work, so the absence of radial authority is not
-by itself fatal.  What fails is the out-of-plane mode: z decouples at linear
-order (z_ddot = -A z), and because da/ddelta = 0 the sail cannot redirect thrust
-into z without changing alpha0.  So a face-on sail reaches the in-plane pair OR
-the vertical mode, never both.
+by itself fatal.  Because da/ddelta = 0, a face-on sail has ONE input whose
+direction is fixed by delta0.  Purely in-plane (delta0 = 0) it cannot reach the
+vertical mode, which decouples at linear order (z_ddot = -A z); purely vertical
+(delta0 = 90 deg) it cannot reach the in-plane pair.  For any other delta0 the
+single input excites both blocks, and since their spectra {+-lambda_u, +-i omega}
+and {+-i nu} are disjoint (nu != omega at every collinear point) the system is
+controllable (PBH test).
 
-    alpha0 = 0 is a singular nominal for sail station-keeping.
+    alpha0 = 0 is a singular nominal for TWO-INPUT attitude control.
 
 Any non-zero cone angle restores full controllability — 0.5 deg is enough for
 rank 6, though the second singular value there is 4.5e-4 against 5.2e-2 for the
@@ -148,9 +152,13 @@ def thruster_jacobian() -> np.ndarray:
 
 
 def report(beta: float = 0.05, A_param: float = 1.409194,
-           x_eq: float = 0.9804, mu: float = MU_SE,
+           x_eq: float = None, mu: float = MU_SE,
            verbose: bool = True) -> dict:
     """Reproduce the controllability table in the module docstring."""
+    if x_eq is None:
+        from src.equilibria import find_artificial_equilibrium
+        x_eq = float(find_artificial_equilibrium(0.0, 0.0, beta, mu,
+                                                 [0.97, 0.0, 0.0])[0])
     A_mat = linearised_cr3bp(A_param)
     pos = (x_eq, 0.0, 0.0)
     rows = []
@@ -165,7 +173,7 @@ def report(beta: float = 0.05, A_param: float = 1.409194,
               f"{f'{r_th}/6':>8}  "
               f"{'controllable' if r_th == 6 else 'UNCONTROLLABLE'}")
 
-    for a0d, d0d in [(0.0, 0.0), (0.0, 90.0), (0.5, 0.0), (2.0, 0.0),
+    for a0d, d0d in [(0.0, 0.0), (0.0, 90.0), (0.0, 45.0), (0.5, 0.0), (2.0, 0.0),
                      (5.0, 0.0), (15.0, 0.0), (35.0, 0.0), (45.0, 0.0)]:
         B = sail_control_jacobian(pos, np.radians(a0d), np.radians(d0d),
                                   beta, mu)
@@ -194,10 +202,10 @@ def report(beta: float = 0.05, A_param: float = 1.409194,
         print(f"  in-plane 4-state block, single transverse input: "
               f"rank {r_in}/4 -> "
               f"{'controllable (Coriolis carries it)' if r_in == 4 else 'not'}")
-        print(f"  out-of-plane mode at alpha0 = 0: unreachable, because "
-              f"da/ddelta = 0")
+        print("  alpha0 = 0: da/ddelta = 0, so a single input; controllable "
+              "unless delta0 is 0 or 90 deg")
         print()
-        print("  => alpha0 = 0 is a SINGULAR nominal for sail station-keeping.")
+        print("  => alpha0 = 0 is a SINGULAR nominal for two-input attitude control.")
 
     return dict(thruster_rank=r_th, sail=rows, inplane_rank=r_in)
 
@@ -301,7 +309,7 @@ def fig_control_authority(output: str = 'fig5_control_authority.png',
     ax.annotate(r'$\sigma_2/\sigma_1 = 1/3$ exactly',
                 xy=(a_star_deg + 2.5, COND_AT_STAR * 0.90), fontsize=7.0)
     ax.axvspan(0, 0.8, color='0.82', zorder=0)
-    ax.annotate(r'$\alpha_0 = 0$: rank 4/6,' + '\n' + 'uncontrollable',
+    ax.annotate(r'$\alpha_0 = 0$: single input' + '\n' + r'(rank 4/6 at $\delta_0 = 0$)',
                 xy=(0.8, 0.010), xytext=(11.0, 0.028), fontsize=6.9,
                 color='0.25', ha='left', va='center',
                 arrowprops=dict(arrowstyle='-', color='0.45', lw=0.6,

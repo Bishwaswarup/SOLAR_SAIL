@@ -9,6 +9,7 @@ code fails here rather than in review.
 """
 from __future__ import annotations
 
+import os
 import re
 import sys
 
@@ -29,7 +30,7 @@ from src.sail_authority import (ALPHA_STAR, COND_AT_STAR, COS2_ALPHA_STAR,
                                 controllability_rank, linearised_cr3bp,
                                 sail_control_jacobian, thruster_jacobian)
 
-TEX = 'paper/main.tex'
+TEX = os.environ.get('SOLARSAIL_TEX', 'paper/main.tex')  # set to paper/springer/main.tex for the journal version
 AU_KM = 1.495978707e8
 
 checks, failures = [], []
@@ -142,7 +143,8 @@ M = linearised_cr3bp(A_ctrl)
 xeq = equilibrium(0.05, MU_SE)
 chk('rank, ideal thruster', controllability_rank(M, thruster_jacobian()), 6,
     tol=0)
-for a0, d0, claimed in [(0.0, 0.0, 4), (0.0, 90.0, 2), (0.5, 0.0, 6)]:
+for a0, d0, claimed in [(0.0, 0.0, 4), (0.0, 90.0, 2), (0.0, 45.0, 6),
+                        (0.5, 0.0, 6)]:
     B = sail_control_jacobian((xeq, 0, 0), np.radians(a0), np.radians(d0),
                               0.05, MU_SE)
     chk(f'rank, sail alpha0={a0} delta0={d0}', controllability_rank(M, B),

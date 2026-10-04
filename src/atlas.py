@@ -55,6 +55,14 @@ DAYS_PER_ND = 365.25 / (2.0 * np.pi)
 DEFAULT_BETAS = np.array([0.001, 0.002, 0.003, 0.005, 0.007, 0.010,
                           0.014, 0.019, 0.025, 0.032, 0.040, 0.050])
 
+# Fine grid for locating where the end of the family switches (see
+# build_fine).  Brackets Verrier, Waters & Sieber's (2014) branch point at
+# beta ~ 0.0387 from both sides.  0.032 and 0.040 are in the main atlas too, so
+# they double as a reproducibility check on the longer walk.
+FINE_BETAS = np.array([0.032, 0.034, 0.036, 0.038, 0.039, 0.0395,
+                       0.040, 0.042, 0.045])
+VERRIER_BRANCH_POINT = 0.0387
+
 
 def build(betas=None, mu: float = MU_SE,
           ds_over_gamma: float = 0.02, n_steps: int = 70,
@@ -236,6 +244,134 @@ def build(betas=None, mu: float = MU_SE,
                 max_dx_over_gamma=max_dx_over_gamma,
                 chain_beta=chain_beta,
                 ref_delta_sign=ref_delta_sign)
+
+
+def classify_end(br: dict) -> str:
+    """
+    How a walked family ends, from continue_branch's structured `end` flag.
+
+      'completed'   Az reached the upper bound (Az/gamma = az_max_over_gamma):
+                    the family runs on to large amplitude.  This is a cutoff of
+                    the analysis, not the true end of the family.
+      'collapse'    Az fell to the lower bound: the branch has turned back and
+                    returned to the planar Lyapunov orbit (Az -> 0).
+      'far_field'   the far-field guard fired.
+      'incomplete'  the step budget (or ds_min) ran out first, so the end was
+                    NOT reached -- never silently counted as either class.
+    """
+    return {'upper_bound': 'completed', 'collapse': 'collapse',
+            'far_field': 'far_field'}.get(br.get('end'), 'incomplete')
+
+
+def end_table(atlas: dict) -> list:
+    """One record per beta: how the family ends, plus the numbers behind it."""
+    rows = []
+    for b in sorted(atlas['families']):
+        br = atlas['families'][b]
+        g = br['gamma']
+        rows.append(dict(beta=b, members=len(br['Az']),
+                         end=classify_end(br),
+                         Az_max_over_gamma=float(br['Az'].max() / g),
+                         Az_last_over_gamma=float(br['Az'][-1] / g),
+                         n_folds=len(br['folds']),
+                         stopped=br.get('stopped', '')))
+    return rows
+
+
+def bracket_switch(rows: list) -> tuple:
+    """
+    (beta_completed, beta_collapse): the largest beta whose family completes
+    that lies below the smallest beta whose family collapses.  Either is None if
+    the grid does not contain that class.  `monotone` is False if a completed
+    family appears ABOVE a collapsed one, in which case the bracket is not a
+    single switch and should not be quoted as one.
+    """
+    comp = [r['beta'] for r in rows if r['end'] == 'completed']
+    coll = [r['beta'] for r in rows if r['end'] == 'collapse']
+    lo = max((c for c in comp if not coll or c < min(coll)), default=None)
+    hi = min(coll, default=None)
+    monotone = not (comp and coll and max(comp) > min(coll))
+    return lo, hi, monotone
+
+
+def summarise_ends(atlas: dict) -> dict:
+    """Print the end-of-family table and the bracketing interval."""
+    rows = end_table(atlas)
+    print("\n   beta     members  end         Az_max/g  Az_last/g  folds")
+    print("  " + "-" * 62)
+    for r in rows:
+        print(f"  {r['beta']:7.4f}  {r['members']:7d}  {r['end']:<10}  "
+              f"{r['Az_max_over_gamma']:8.3f}  {r['Az_last_over_gamma']:9.3f}  "
+              f"{r['n_folds']:5d}")
+    lo, hi, mono = bracket_switch(rows)
+    print()
+    if lo is None or hi is None:
+        print("  No switch bracketed: the grid contains only one end class "
+              "(or none that finished).")
+    else:
+        print(f"  Completed -> collapse switch lies in  "
+              f"({lo:.4f}, {hi:.4f}]   [Verrier et al. branch point: "
+              f"{VERRIER_BRANCH_POINT}]")
+        if not mono:
+            print("  WARNING: a completed family sits above a collapsed one; "
+                  "the classes are not separated by a single beta.")
+    inc = [r['beta'] for r in rows if r['end'] in ('incomplete', 'far_field')]
+    if inc:
+        print(f"  WARNING: end not classified at beta = {inc} "
+              f"(raise n_steps or inspect the stop reason).")
+    return dict(rows=rows, bracket=(lo, hi), monotone=mono)
+
+
+def export_ends_csv(atlas: dict, path: str = 'halo_atlas_fine_ends.csv') -> str:
+    """Write the end-of-family table (one row per beta)."""
+    import csv
+    rows = end_table(atlas)
+    with open(path, 'w', newline='') as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w.writeheader()
+        for r in rows:
+            w.writerow({k: (f"{v:.6f}" if isinstance(v, float) else v)
+                        for k, v in r.items()})
+    return path
+
+
+def build_fine(betas=None, n_steps: int = 450, verbose: bool = True,
+               **kw) -> dict:
+    """
+    Walk the halo family on a fine beta grid, to termination.
+
+    The main atlas stops each walk after 70 members, which is enough to
+    characterise the family but not to see where it ENDS: at beta = 0.032 the
+    walk is still climbing at member 70 and only reaches Az/gamma = 1 after ~300.
+    Here the budget is large enough that every walk ends on a bound or a guard,
+    and classify_end() reports which.  A walk that exhausts the budget is
+    reported as 'incomplete', never folded into either class.
+
+    Chaining across beta is kept (so branch identity is enforced exactly as in
+    build()); with the grid in ascending order each beta is seeded from its
+    predecessor.  Everything else is build()'s default.
+    """
+    if betas is None:
+        betas = FINE_BETAS
+    return build(betas=np.sort(np.asarray(betas, dtype=float)),
+                 n_steps=n_steps, verbose=verbose, **kw)
+
+
+def fine_build_and_report(betas=None, n_steps: int = 450,
+                          members_csv: str = 'halo_atlas_fine.csv',
+                          ends_csv: str = 'halo_atlas_fine_ends.csv') -> dict:
+    """build_fine + print the end table + write both CSVs.  Leaves
+    halo_atlas.csv alone."""
+    a = build_fine(betas=betas, n_steps=n_steps, verbose=True)
+    summarise_ends(a)
+    export_csv(a, members_csv)
+    export_ends_csv(a, ends_csv)
+    if a.get('suspect'):
+        print(f"\n  BRANCH GUARD flagged: {a['suspect']}")
+    if a.get('failed'):
+        print(f"\n  FAILED betas: {a['failed']}")
+    print(f"\n  wrote {members_csv}, {ends_csv}")
+    return a
 
 
 def summarise(atlas: dict) -> None:

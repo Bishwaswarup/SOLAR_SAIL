@@ -399,6 +399,12 @@ def continue_branch(eq_pos, mu: float,
 
     rows, folds, n_failed = [], [], 0
     t_prev = t
+    # Machine-readable reason the walk ended, so callers need not parse the
+    # `stopped` string:  'collapse' (lambda hit the lower bound -- for
+    # param='Az' the family has returned to the planar Lyapunov orbit),
+    # 'upper_bound', 'far_field', 'ds_min', or 'n_steps' (budget exhausted,
+    # i.e. the end was NOT reached).
+    end = 'n_steps'
 
     # Local length scale and the far-field guard.
     x_eq = float(eq_pos[0])
@@ -450,6 +456,7 @@ def continue_branch(eq_pos, mu: float,
             step *= 0.5
             if abs(step) < ds_min:
                 stopped = f"arclength fell below ds_min={ds_min:g}"
+                end = 'ds_min'
                 if verbose:
                     print(f"    stopped: {stopped}")
                 break
@@ -464,6 +471,7 @@ def continue_branch(eq_pos, mu: float,
             n_far_field += 1
             stopped = (f"far-field guard: |x0 - x_eq| = {d_far:.2f} gamma "
                        f"> {max_dx_over_gamma:g} at {param}={v_new[3]:.6f}")
+            end = 'far_field'
             if verbose:
                 print(f"    stopped: {stopped}")
             break
@@ -487,6 +495,7 @@ def continue_branch(eq_pos, mu: float,
             if not (lo <= v_new[3] <= hi):
                 stopped = (f"{param}={v_new[3]:.6g} left bounds "
                            f"[{lo:g}, {hi:g}]")
+                end = 'collapse' if v_new[3] < lo else 'upper_bound'
                 if verbose:
                     print(f"    stopped: {stopped}")
                 break
@@ -515,6 +524,7 @@ def continue_branch(eq_pos, mu: float,
     out['x_eq'] = x_eq
     out['n_far_field'] = n_far_field
     out['stopped'] = stopped or f"completed {n_steps} steps"
+    out['end'] = end
     # Post-condition: the guard must have held for every recorded member.
     dx_g = np.abs(out['x0'] - x_eq) / gamma
     assert np.all(dx_g <= max_dx_over_gamma), (

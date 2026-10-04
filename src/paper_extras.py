@@ -1,28 +1,22 @@
 """
 paper_extras.py — Publication comparison figures for the solar-sail CR3BP paper.
 
-Reproduces and extends the style of:
-  • Farrés & Jorba (2010)  "A dynamical systems approach to the station keeping
-    of a solar sail"  JGCD 33(6):1352-1368.
-  • Farrés & Jorba (2012)  "Dynamics of a solar sail near a halo orbit"
-    Acta Astronautica 67:979-990.
-
 Figures produced
 ─────────────────
   fig1_beta_family.png
       β-family of halo orbits in the x-z plane, colour-coded by β.
       Equilibrium locus (x*(β), 0) drawn as a dashed curve.
-      Companion panel: x-y view.  Style matches Farrés & Jorba Fig 1.
+      Companion panel: x-y view.
 
   fig2_stability.png
-      Two panels:
-        Left  — unstable Floquet multiplier λ_u(β)  [log scale]
+      Two panels, for the Az = 0.003 L1 halo orbit across the flown band
+      beta in [0, 0.05] (halo character enforced, require_halo=True):
+        Left  — largest Floquet multiplier |rho|_max(β)  [log scale]
         Right — orbital period T(β)  [non-dim + days on twin axis]
-      Benchmark values from Farrés & Jorba (2010) Table 1 overlaid as
-      red ✕ markers where available.
+      No external benchmark is overlaid.
 
   fig3_floquet.png
-      Floquet multipliers on the complex plane for β=0 and β=0.5.
+      Floquet multipliers on the complex plane for β=0 and β=0.05.
       Unit circle drawn for reference; multipliers plotted.
       This shows how sail tuning tames the unstable eigenvalue.
 
@@ -69,19 +63,12 @@ VEL_NONDIM_KMS  = 29.7847                # 1 non-dim vel ≡ 29.78 km/s
 AZ              = 0.003                   # halo out-of-plane amplitude
 
 # ── β sweep data (pre-computed or computed on first call) ─────────────────────
-_BETAS = np.array([0.0, 0.05, 0.10, 0.15, 0.20, 0.25,
-                   0.30, 0.35, 0.40, 0.45, 0.50])
+# Flown band only.  Above beta ~ 0.05 the corrector at Az = 0.003 converges to
+# the vertical-Lyapunov family (z-symmetric, x0 = x_eq), not a halo, so the
+# sweep is restricted to the band and require_halo=True is enforced below.
+_BETAS = np.array([0.0, 0.005, 0.010, 0.015, 0.020, 0.025,
+                   0.030, 0.035, 0.040, 0.045, 0.050])
 
-# Farrés & Jorba (2010) Table 1 / Fig 4 benchmark points
-# (β,  λ_u)  — read from published table; only collinear L₁ values, Az≈0.003
-_FJ2010_BENCH = {
-    # β  : (λ_u,    T_nondim)   — None where not tabulated
-    0.00 : (1350.0,  3.05),
-    0.10 : (14.5,    6.07),
-    0.20 : (2.70,    6.26),
-    0.30 : (1.70,    6.28),
-    0.50 : (1.25,    6.28),
-}
 
 
 def _compute_sweep(betas=_BETAS, az=AZ, verbose=True):
@@ -100,7 +87,8 @@ def _compute_sweep(betas=_BETAS, az=AZ, verbose=True):
             eq = find_artificial_equilibrium(0.0, 0.0, b, MU,
                                              [x_guess - 0.02, 0.0, 0.0])
             x_guess = eq[0]
-            s0, T = compute_halo_orbit(eq, az, MU, 0.0, 0.0, b)
+            s0, T = compute_halo_orbit(eq, az, MU, 0.0, 0.0, b,
+                                       require_halo=True)
             M  = compute_monodromy(s0, T, MU, 0.0, 0.0, b)
             w  = np.sort(np.abs(np.linalg.eigvals(M)))
             lu = w[-1]
@@ -161,7 +149,7 @@ def _apply_style():
 def fig_beta_family(sweep=None, output='fig1_beta_family.png', verbose=True):
     """
     Two-panel figure: x-z (left) and x-y (right) projections of the halo
-    orbit family for β = 0 … 0.5.  Matches Farrés & Jorba (2010) Fig 1.
+    orbit family across the flown band β = 0 … 0.05.
 
     Parameters
     ----------
@@ -267,8 +255,8 @@ def fig_beta_family(sweep=None, output='fig1_beta_family.png', verbose=True):
 
 def fig_stability_sweep(sweep=None, output='fig2_stability.png', verbose=True):
     """
-    Two-panel figure reproducing Farrés & Jorba (2010) stability analysis:
-      Left  — λ_u(β) on log scale with F&J Table 1 benchmark points
+    Two-panel figure for the Az = 0.003 L1 halo orbit across the flown band:
+      Left  — largest Floquet multiplier |rho|_max(β) on a log scale
       Right — T(β) in non-dim and days
     """
     if sweep is None:
@@ -285,30 +273,21 @@ def fig_stability_sweep(sweep=None, output='fig2_stability.png', verbose=True):
     fig, (ax_lu, ax_T) = plt.subplots(1, 2, figsize=(10, 4.5))
 
     # ── left: λ_u ─────────────────────────────────────────────────────────────
-    ax_lu.semilogy(betas[good], lambdas[good], 'b-o', ms=5, lw=1.5,
-                   label='This work')
+    ax_lu.semilogy(betas[good], lambdas[good], 'b-o', ms=5, lw=1.5)
     ax_lu.semilogy(betas[good], lambdas[good], 'b-', lw=1.5)
 
-    # F&J benchmark
-    fj_betas  = np.array(sorted(_FJ2010_BENCH.keys()))
-    fj_lambda = np.array([_FJ2010_BENCH[b][0] for b in fj_betas])
-    ax_lu.scatter(fj_betas, fj_lambda, marker='x', s=70, color='red',
-                  linewidths=1.5, zorder=6,
-                  label='Farrés & Jorba (2010) Table 1')
-
     ax_lu.set_xlabel('β  (sail lightness number)')
-    ax_lu.set_ylabel('Unstable Floquet multiplier  λ_u')
+    ax_lu.set_ylabel(r'largest Floquet multiplier  $|\rho|_{\max}$')
     ax_lu.set_title('Stability vs sail lightness')
-    ax_lu.legend()
-    ax_lu.set_xlim(-0.02, 0.55)
+    ax_lu.set_xlim(-0.002, 0.052)
     ax_lu.yaxis.set_major_formatter(
         mticker.LogFormatterMathtext())
 
     # annotate dramatic range
     ax_lu.annotate(
-        f'λ_u drops\n{lambdas[good][0]:.0f} → {lambdas[good][-1]:.2f}',
-        xy=(0.48, lambdas[good][-1]),
-        xytext=(0.30, lambdas[good][-1] * 8),
+        f'$|\\rho|_{{\\max}}$ falls\n{lambdas[good][0]:.0f} → {lambdas[good][-1]:.1f}',
+        xy=(betas[good][-1], lambdas[good][-1]),
+        xytext=(0.030, lambdas[good][-1] * 8),
         arrowprops=dict(arrowstyle='->', color='black', lw=1.0),
         fontsize=8, color='#333333')
 
@@ -320,23 +299,18 @@ def fig_stability_sweep(sweep=None, output='fig2_stability.png', verbose=True):
         *[d for d in [tau_days.min() * 0.7, tau_days.max() * 1.3]])
     ax_lu2.set_ylabel('e-fold time  τ  [days]', color='#669966')
     ax_lu2.tick_params(axis='y', labelcolor='#669966')
+    ax_lu2.yaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax_lu2.yaxis.set_minor_formatter(mticker.NullFormatter())
     ax_lu2.plot(betas[good], tau_days, color='#669966',
                 ls='--', lw=1.0, alpha=0.5)
 
     # ── right: period ─────────────────────────────────────────────────────────
-    ax_T.plot(betas[good], periods[good], 'b-o', ms=5, lw=1.5,
-              label='This work')
-
-    fj_T = np.array([_FJ2010_BENCH[b][1] for b in fj_betas])
-    ax_T.scatter(fj_betas, fj_T, marker='x', s=70, color='red',
-                 linewidths=1.5, zorder=6,
-                 label='Farrés & Jorba (2010)')
+    ax_T.plot(betas[good], periods[good], 'b-o', ms=5, lw=1.5)
 
     ax_T.set_xlabel('β  (sail lightness number)')
     ax_T.set_ylabel('Orbital period  T  [non-dim]')
     ax_T.set_title('Period vs sail lightness')
-    ax_T.set_xlim(-0.02, 0.55)
-    ax_T.legend()
+    ax_T.set_xlim(-0.002, 0.052)
 
     # twin axis in days
     ax_T2 = ax_T.twinx()
@@ -350,8 +324,8 @@ def fig_stability_sweep(sweep=None, output='fig2_stability.png', verbose=True):
         np.round(ax_T.get_yticks() * DAYS_PER_NONDIM, 0))
 
     fig.suptitle(
-        'Stability and period of sail-displaced L₁ halo orbits\n'
-        '(Sun-Earth, Az = 0.003 non-dim;  compared with Farrés & Jorba 2010)',
+        'Stability and period of the sail-displaced L₁ halo orbit\n'
+        '(Sun–Earth, Az = 0.003 non-dim, flown band 0 ≤ β ≤ 0.05)',
         fontsize=10, y=1.02)
     plt.tight_layout()
     fig.savefig(output, dpi=200, bbox_inches='tight')
@@ -368,8 +342,7 @@ def fig_stability_sweep(sweep=None, output='fig2_stability.png', verbose=True):
 def fig_floquet(sweep=None, output='fig3_floquet.png', verbose=True):
     """
     Floquet multipliers of the monodromy matrix plotted on the complex
-    plane for β = 0 and β = 0.5.  Unit circle shown for reference.
-    Reproduces the style of Farrés & Jorba (2012) Fig 2.
+    plane for β = 0 and β = 0.05.  Unit circle shown for reference.
     """
     if sweep is None:
         if verbose:
@@ -378,9 +351,9 @@ def fig_floquet(sweep=None, output='fig3_floquet.png', verbose=True):
 
     from src.manifolds import compute_monodromy
 
-    betas_show = [0.0, 0.5]
+    betas_show = [0.0, 0.05]
     colors     = ['steelblue', 'darkorange']
-    labels     = ['β = 0  (classical)', 'β = 0.5  (high-performance sail)']
+    labels     = ['β = 0  (classical)', 'β = 0.05  (top of the flown band)']
 
     _apply_style()
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
@@ -429,7 +402,7 @@ def fig_floquet(sweep=None, output='fig3_floquet.png', verbose=True):
 
     fig.suptitle(
         'Floquet multipliers of the monodromy matrix\n'
-        '(Farrés & Jorba 2012 style — unit circle is the stability boundary)',
+        '(unit circle is the stability boundary)',
         fontsize=10, y=1.01)
     plt.tight_layout()
     fig.savefig(output, dpi=200, bbox_inches='tight')

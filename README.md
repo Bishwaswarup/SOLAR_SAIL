@@ -269,8 +269,16 @@ python -m src.paper_extras fig5sk  # station-keeping
 4. **Reframe the manuscript** around the dissolution result rather than "the orbit became stable."
 5. **Push into β ∈ [0.001, 0.05]** — halo families and their stability across that window, real heteroclinic connections there, and the off-axis (α ≠ 0) case where the force is non-conservative and the effective-potential analysis used here breaks entirely.
 
+## License
+
+[MIT](LICENSE) © 2026 Bishwaswarup Nayak
+
 ---
 
 <div align="center">
 <sub>Bishwaswarup · Indian Institute of Science, Bangalore · an independent project</sub>
 </div>
+
+## License
+
+[MIT](LICENSE) © 2026 Bishwaswarup Nayak

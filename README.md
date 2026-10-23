@@ -11,6 +11,7 @@
 [![SciPy](https://img.shields.io/badge/SciPy-ODE%20Solver-8CAAE6?logo=scipy)](https://scipy.org)
 [![Matplotlib](https://img.shields.io/badge/Matplotlib-Figures-11557c)](https://matplotlib.org)
 [![IISc](https://img.shields.io/badge/IISc-Bangalore-E04B00)](https://iisc.ac.in)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23588838.svg)](https://doi.org/10.5281/zenodo.23588838)
 
 **Bishwaswarup** · Indian Institute of Science, Bangalore · independent project
 

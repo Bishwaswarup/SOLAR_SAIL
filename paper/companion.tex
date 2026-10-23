@@ -21,7 +21,7 @@
   citecolor  = {[rgb]{0.10,0.36,0.26}},
   urlcolor   = {[rgb]{0.40,0.16,0.36}},
   pdftitle   = {Derivations, conventions and diagnostics},
-  pdfauthor  = {Bishwaswarup}
+  pdfauthor  = {Bishwaswarup Nayak}
 }
 
 \sisetup{group-minimum-digits=4, detect-all}
@@ -34,7 +34,9 @@
 \title{\bfseries Derivations, conventions and diagnostics\\
 \large A companion to \emph{Dissolution of the collinear structure in the
 solar-sail circular restricted three-body problem}}
-\author{Bishwaswarup}
+\author{Bishwaswarup Nayak\\[2pt]
+\small Department of Physics, Indian Institute of Science, Bengaluru 560012, India\\
+\small\texttt{bishwaswarup@iisc.ac.in}}
 \date{\today}
 
 \begin{document}
@@ -848,8 +850,13 @@ Kalman rank condition on $[B,\,MB,\,M^2B,\dots,M^5B]$ for the $6\times6$ system
 matrix $M$. Applying it at the $\beta=0.05$ equilibrium ($c_2=1.409194$) gives
 rank $4/6$ at $\alpha_0=0,\delta_0=0$ --- the in-plane four-state block is fully
 controllable (rank $4/4$), and it is the \emph{out-of-plane} pair that is lost,
-because $z$ decouples at linear order and only $\partial\bm a/\partial\delta$
-could have reached it.
+because $z$ decouples at linear order. That loss is specific to $\delta_0=0$.
+Purely vertical tilt ($\delta_0=\pi/2$) gives rank $2/6$, losing the in-plane
+pair instead. For any other $\delta_0$ the single input has components in both
+blocks, and because their spectra $\{\pm\lambda_u,\pm\mathrm{i}\omega\}$ and
+$\{\pm\mathrm{i}\nu\}$ are disjoint whenever $\nu\neq\omega$, the
+Popov--Belevitch--Hautus test gives full rank: at $\delta_0=\pi/4$ the rank is
+$6/6$. What $\alpha_0=0$ removes is the second input, not controllability.
 
 \subsection{The optimal cone angle}
 
@@ -1060,15 +1067,17 @@ The repository is public at
 \url{https://github.com/Bishwaswarup/SOLAR_SAIL}. From a clean clone:
 \begin{verbatim}
   pip install -r requirements.txt
-  python main.py verify     # regression suite + 175 manuscript checks
+  python main.py verify     # regression suite + 217 manuscript checks
   python main.py results    # regenerates results.txt
   python main.py atlas      # re-walks the 12 halo families (slow)
+  python main.py atlas_fine # fine-beta walk to the family's end (slow)
   python main.py figures    # regenerates the paper figures
 \end{verbatim}
 \texttt{paper/verify\_numbers.py} is the authority on manuscript agreement. It
 recomputes each claim from the \texttt{src/} modules and compares it against the
-literal typed in \texttt{main.tex}; Tables 2, 3 and 4 are parsed cell by cell
-out of the manuscript source, so a table cannot silently disagree with the
+literal typed in the manuscript (\texttt{paper/springer/main.tex}); its tables
+of closed-form thresholds, the $\kappa$ hierarchy, e-folding horizons and the
+fine atlas are parsed cell by cell out of the manuscript source, so a table cannot silently disagree with the
 formula it tabulates. A drifted number fails there rather than in review.
 
 \end{document}

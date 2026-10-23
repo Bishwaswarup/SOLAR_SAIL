@@ -36,3 +36,7 @@ __MACOSX/
 ._*
 .claude/
 .claude/
+*.zip
+paper/springer/*.docx
+paper/springer/cover_letter.*
+paper/Dissolution_of_the_collinear_structure_in_the_solar_sail_CR3BP.pdf
